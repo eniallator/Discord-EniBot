@@ -1,9 +1,14 @@
 import asyncio
 import discord
+from time import gmtime, strftime
 import Credentials
 from Commands import COMMANDS
 
 CLIENT = discord.Client()
+
+def _get_time():
+    raw_time = strftime("%Y/%m/%d %H:%M:%S", gmtime())
+    return '[' + raw_time + '] '
 
 @CLIENT.event
 async def on_ready():
@@ -17,7 +22,7 @@ async def on_message(message):
     if str(message.channel) == 'bot_testing' and not message.author.bot:
         for command in COMMANDS:
             if message.content.lower().startswith(command['start']):
-                print('"' + message.content + '" ran as command')
+                print(_get_time() + str(message.author) + ' ran: "' + message.content + '" in server: ' + message.server.name)
                 await command['func'](CLIENT, message)
                 break
 
