@@ -5,5 +5,6 @@ def _ping(client, message, user_command):
 
 COMMANDS.append({
     'start': 'ping',
+    'help': 'Replies with "Pong!"',
     'func': _ping
 })
