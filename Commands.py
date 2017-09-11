@@ -1,8 +1,6 @@
 """My EniBot command list. If you have an idea for a command, get in touch!"""
 from GOL_Sim.GOL_Simulation import GOL_Simulation
 
-CURR_GOL_SIM = GOL_Simulation()
-
 COMMANDS = []
 
 def _ping(client, message, user_command):
@@ -24,22 +22,44 @@ COMMANDS.append({
 })
 
 GOL_COMMANDS = []
+GOL_INSTANCES = {}
+GOL_MAX_PROCESSING = 500000
 
-def _gol_sim_new(command_terms):
-    params = command_terms[1:]
+def _gol_sim_new(command_terms, server):
+    args = command_terms[1:]
     response = ''
-    for index, term in enumerate(params):
+    for index, term in enumerate(args):
         try:
-            int(term)
+            if '.' in term:
+                args[index] = float(term)
+            else:
+                args[index] = int(term)
         except:
             response += 'The term at index ' + str(index + 2) + ' has to be a number.\n'
     
-    if len(params) > 6:
-        response += 'Expecting 6 or less terms'
+    if len(args) > 6:
+        response += 'Expecting 6 or less terms.'
     
-    if not response:
-        CURR_GOL_SIM = GOL_Simulation(*params)
-        response = 'Successfully created a new game of life genetic algorithm.'
+    if not response and server:
+        default_vals = [50, 5, 5, 30]
+        accumulator = 1
+        for i, val in enumerate(default_vals):
+            if len(args) > i:
+                accumulator *= args[i]
+            else:
+                accumulator *= val
+        if accumulator <= GOL_MAX_PROCESSING:
+            if server in GOL_INSTANCES:
+                del GOL_INSTANCES[server]
+            try:
+                GOL_INSTANCES[server] = GOL_Simulation(*args)
+                response = 'Successfully created a new game of life genetic algorithm.'
+            except:
+                response = 'All arguments have to be integers except for mutation chance which is a float.'
+        else:
+            response = 'Max processing exceeded. Please choose smaller input arguments.'
+    elif not server:
+        response = 'Instances can only be created on servers.'
     
     return response
 
@@ -50,10 +70,15 @@ GOL_COMMANDS.append({
     'func': _gol_sim_new
 })
 
-def _gol_sim_next_cycle(command_terms):
-    CURR_GOL_SIM.evaluate()
-    response = CURR_GOL_SIM.stats()
-    CURR_GOL_SIM.evolve_population()
+def _gol_sim_next_cycle(command_terms, server):
+    response = ''
+    if server and server in GOL_INSTANCES:
+        curr_sim = GOL_INSTANCES[server]
+        curr_sim.evaluate()
+        response = curr_sim.stats()
+        curr_sim.evolve_population()
+    else:
+        response = 'Game of life instance does not exist. To create, use `gol_sim new`'
     return response
 
 GOL_COMMANDS.append({
@@ -87,7 +112,7 @@ def _gol_sim(client, message, user_command):
     else:
         for command in GOL_COMMANDS:
             if command['start'] == command_terms[0].lower():
-                response = command['func'](command_terms)
+                response = command['func'](command_terms, str(message.server))
     return client.send_message(message.channel, response)
 
 COMMANDS.append({
