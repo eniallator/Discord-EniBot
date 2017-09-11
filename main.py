@@ -33,10 +33,7 @@ def _command_handler(message, user_command):
 @CLIENT.event
 async def on_ready():
     """When the bot logs in to discord"""
-    print('Logged in as')
-    print(CLIENT.user.name)
-    print(CLIENT.user.id)
-    print('------')
+    _log('Bot logged in with name: "' + CLIENT.user.name + '" and id: ' + CLIENT.user.id + '\n')
 
 @CLIENT.event
 async def on_message(message):
