@@ -1,9 +1,6 @@
 """My EniBot main script. Handles commands however won't store them (with exception of help)"""
 from time import gmtime, strftime
-
-# import asyncio
 import discord
-
 import Credentials
 from Commands import COMMANDS
 
