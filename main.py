@@ -1,6 +1,7 @@
+"""My EniBot main script. Handles commands however won't store them (with exception of help)"""
 from time import gmtime, strftime
 
-import asyncio
+# import asyncio
 import discord
 
 import Credentials
@@ -34,6 +35,7 @@ def _command_handler(message, user_command):
 
 @CLIENT.event
 async def on_ready():
+    """When the bot logs in to discord"""
     print('Logged in as')
     print(CLIENT.user.name)
     print(CLIENT.user.id)
@@ -41,6 +43,7 @@ async def on_ready():
 
 @CLIENT.event
 async def on_message(message):
+    """Handles any user commands"""
     prefix = '<@' + CLIENT.user.id + '> '
     if str(message.channel) == 'bot_testing' and not message.author.bot and message.content.startswith(prefix):
         user_command = message.content.replace(prefix, '', 1)

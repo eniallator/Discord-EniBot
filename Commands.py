@@ -1,3 +1,4 @@
+"""My EniBot command list. If you have an idea for a command, get in touch!"""
 COMMANDS = []
 
 def _ping(client, message, user_command):
