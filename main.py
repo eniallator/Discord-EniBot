@@ -1,6 +1,8 @@
 import asyncio
 import discord
+
 from time import gmtime, strftime
+
 import Credentials
 from Commands import COMMANDS
 
@@ -19,11 +21,13 @@ async def on_ready():
 
 @CLIENT.event
 async def on_message(message):
-    if str(message.channel) == 'bot_testing' and not message.author.bot:
+    prefix = '<@' + CLIENT.user.id + '> '
+    if str(message.channel) == 'bot_testing' and not message.author.bot and message.content.startswith(prefix):
         for command in COMMANDS:
-            if message.content.lower().startswith(command['start']):
-                print(_get_time() + str(message.author) + ' ran: "' + message.content + '" in server: ' + message.server.name)
-                await command['func'](CLIENT, message)
+            user_command = message.content.replace(prefix, '', 1)
+            if user_command.lower().startswith(command['start']):
+                print(_get_time() + str(message.author) + ' ran: "' + user_command + '" in server: ' + message.server.name)
+                await command['func'](CLIENT, message, user_command)
                 break
 
 CLIENT.run(Credentials.TOKEN)
