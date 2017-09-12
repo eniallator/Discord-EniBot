@@ -27,7 +27,7 @@ COMMANDS.append({
 GOL_COMMANDS = []
 GOL_INSTANCES = {}
 GOL_MAX_PROCESSING = 500000
-GOL_MAX_CYCLES = 50
+GOL_MAX_CYCLES = 10
 
 def _gol_new(command_terms, server):
     args = command_terms[1:]
@@ -110,15 +110,15 @@ def _gol_cycle(command_terms, server):
                 for i in range(limit):
                     response = _cycle_instance(GOL_INSTANCES[server])
             else:
-                response = 'Limit too big. Choose an integer between 1-50.'
+                response = 'Limit out of range. Choose an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
         except:
-            response = 'The second argument has to be an integer between 1-50.'
+            response = 'The second argument has to be an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
     return response
 
 GOL_COMMANDS.append({
     'start': 'cycle',
     'help': 'Evolves the population a number of times and gives stats for the population afterwards.',
-    'specific_help': 'Receives 1 argument; a number from 1-50 to cycle through the simulation.\n Usage: `gol cycle limit`',
+    'specific_help': 'Receives 1 argument; a number from 1-' + str(GOL_MAX_CYCLES) + ' to cycle through the simulation.\n Usage: `gol cycle limit`',
     'func': _gol_cycle
 })
 
