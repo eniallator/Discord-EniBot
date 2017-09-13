@@ -26,8 +26,9 @@ COMMANDS.append({
 
 GOL_COMMANDS = []
 GOL_INSTANCES = {}
-GOL_MAX_PROCESSING = 500000
+GOL_MAX_PROCESSING = 50 ** 50 * 5 * 5
 GOL_MAX_CYCLES = 10
+
 
 def _gol_new(command_terms, server):
     args = command_terms[1:]
@@ -45,11 +46,19 @@ def _gol_new(command_terms, server):
         response += 'Expecting 6 or less terms.'
     
     if not response and server:
-        default_vals = [50, 5, 5, 30]
+        default_vals = [5, 5]
         accumulator = 1
+        if len(args) > 0:
+            accumulator *= args[0]
+        else:
+            accumulator *= 50
+        if len(args) > 3:
+            accumulator = accumulator ** args[3]
+        else:
+            accumulator = accumulator ** 30
         for i, val in enumerate(default_vals):
-            if len(args) > i:
-                accumulator *= args[i]
+            if len(args) > i + 1:
+                accumulator *= args[i + 1]
             else:
                 accumulator *= val
         if accumulator <= GOL_MAX_PROCESSING:
@@ -70,7 +79,7 @@ def _gol_new(command_terms, server):
 GOL_COMMANDS.append({
     'start': 'new',
     'help': 'Create a new game of life genetic algorithm.',
-    'specific_help': 'Where all arguments are optional and all are numbers.\nUsage: `gol new size width height iterations mutation_chance creatures_to_remain`',
+    'specific_help': 'Where all arguments are optional and all are numbers.\nDefaults: `size=50, width=5, height=5, iterations=30, mutation_chance=0.025, creatures_to_remain=5`\nUsage: `gol new size width height iterations mutation_chance creatures_to_remain`',
     'func': _gol_new
 })
 
