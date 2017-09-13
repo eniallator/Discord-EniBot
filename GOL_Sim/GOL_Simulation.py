@@ -1,5 +1,6 @@
 from GOL_Sim.Population import Population
 from GOL_Sim.Creature import Creature
+from GOL_Sim.GOL_Link import create_creature_url
 
 
 class GOL_Simulation(object):
@@ -77,6 +78,8 @@ class GOL_Simulation(object):
             dna_to_display = best_dna.dna[i * best_dna.height : (i + 1) * best_dna.height]
             stats_msg += ', '.join(str(gene) for gene in dna_to_display) + '\n'
         stats_msg += '```'
+
+        stats_msg += 'Creature run url: `' + create_creature_url(best_dna) + '`'
 
         return stats_msg
 
