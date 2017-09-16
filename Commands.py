@@ -4,8 +4,8 @@ from GOL_Sim.GOL_Simulation import GOL_Simulation
 COMMANDS = []
 
 
-def _ping(client, message, user_command):
-    return client.send_message(message.channel, 'Pong!')
+def _ping(client, message, user_command, iteration):
+    return {'output': 'Pong!'}
 
 COMMANDS.append({
     'start': 'ping',
@@ -14,8 +14,8 @@ COMMANDS.append({
 })
 
 
-def _source_code(client, message, user_command):
-    return client.send_message(message.channel, 'https://github.com/eniallator/Discord-EniBot')
+def _source_code(client, message, user_command, iteration):
+    return {'output': 'https://github.com/eniallator/Discord-EniBot'}
 
 COMMANDS.append({
     'start': 'source_code',
@@ -26,11 +26,11 @@ COMMANDS.append({
 
 GOL_COMMANDS = []
 GOL_INSTANCES = {}
-GOL_MAX_PROCESSING = 50 ** 50 * 5 * 5
-GOL_MAX_CYCLES = 10
+GOL_MAX_PROCESSING = 75 ** 50 * (10 * 10)
+GOL_MAX_CYCLES = 25
 
 
-def _gol_new(command_terms, server):
+def _gol_new(client, message, command_terms, iteration):
     args = command_terms[1:]
     response = ''
     for index, term in enumerate(args):
@@ -45,36 +45,24 @@ def _gol_new(command_terms, server):
     if len(args) > 6:
         response += 'Expecting 6 or less terms.'
     
-    if not response and server:
-        default_vals = [5, 5]
-        accumulator = 1
-        if len(args) > 0:
-            accumulator *= args[0]
-        else:
-            accumulator *= 50
-        if len(args) > 3:
-            accumulator = accumulator ** args[3]
-        else:
-            accumulator = accumulator ** 30
-        for i, val in enumerate(default_vals):
-            if len(args) > i + 1:
-                accumulator *= args[i + 1]
-            else:
-                accumulator *= val
+    if not response and str(message.server):
+        default_vals = [50, 5, 5, 30]
+        intensive_args = [args[i] if len(args) > i else val for i, val in enumerate(default_vals)]
+        accumulator = intensive_args[0] ** intensive_args[1] * (intensive_args[1] * intensive_args[2])
         if accumulator <= GOL_MAX_PROCESSING:
-            if server in GOL_INSTANCES:
-                del GOL_INSTANCES[server]
+            if str(message.server) in GOL_INSTANCES:
+                del GOL_INSTANCES[str(message.server)]
             try:
-                GOL_INSTANCES[server] = GOL_Simulation(*args)
+                GOL_INSTANCES[str(message.server)] = GOL_Simulation(*args)
                 response = 'Successfully created a new game of life genetic algorithm.'
             except:
                 response = 'All arguments have to be integers except for mutation chance which is a float.'
         else:
             response = 'Max processing exceeded. Please choose smaller input arguments.'
-    elif not server:
+    elif not str(message.server):
         response = 'Instances can only be created on servers.'
     
-    return response
+    return {'output': response}
 
 GOL_COMMANDS.append({
     'start': 'new',
@@ -91,16 +79,16 @@ def _validate_gol_instance(server):
         return 'Game of life instance does not exist. To create, use `gol new`'
 
 def _cycle_instance(instance):
-        instance.evaluate()
-        response = instance.stats()
-        instance.evolve_population()
-        return response
-
-def _gol_next_cycle(command_terms, server):
-    response = _validate_gol_instance(server)
-    if not response:
-        response = _cycle_instance(GOL_INSTANCES[server])
+    instance.evaluate()
+    response = instance.stats()
+    instance.evolve_population()
     return response
+
+def _gol_next_cycle(client, message, command_terms, iteration):
+    response = _validate_gol_instance(str(message.server))
+    if not response:
+        response = _cycle_instance(GOL_INSTANCES[str(message.server)])
+    return {'output': response}
 
 GOL_COMMANDS.append({
     'start': 'next_cycle',
@@ -110,18 +98,22 @@ GOL_COMMANDS.append({
 })
 
 
-def _gol_cycle(command_terms, server):
-    response = _validate_gol_instance(server)
-    if not response:
+def _gol_cycle(client, message, command_terms, iteration):
+    response = {}
+    output_message = _validate_gol_instance(str(message.server))
+    if not output_message:
         try:
-            limit = int(command_terms[1])
-            if 1 <= limit <= GOL_MAX_CYCLES:
-                for i in range(limit):
-                    response = _cycle_instance(GOL_INSTANCES[server])
+            response['limit'] = int(command_terms[1])
+            if 1 <= response['limit'] <= GOL_MAX_CYCLES:
+                output = _cycle_instance(GOL_INSTANCES[str(message.server)])
+                if iteration >= response['limit']:
+                    output_message = output
             else:
-                response = 'Limit out of range. Choose an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
-        except:
-            response = 'The second argument has to be an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
+                output_message = 'Limit out of range. Choose an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
+        except ValueError:
+            output_message = 'The second argument has to be an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
+    if output_message:
+        response['output'] = output_message
     return response
 
 GOL_COMMANDS.append({
@@ -132,7 +124,7 @@ GOL_COMMANDS.append({
 })
 
 
-def _gol_help_handler(command_terms):
+def _gol_help_handler(client, message, command_terms):
     response = ''
     if len(command_terms) == 1:
         response = 'gol help displayed in the following format:\n"gol Command": Help_for_command\n'
@@ -141,23 +133,21 @@ def _gol_help_handler(command_terms):
         response += '\n\nUse `gol help COMMAND` to get more help on specific commands.'
     else:
         for command in GOL_COMMANDS:
-            if command['start'] == command_terms[1]:
+            if len(command_terms) > 1 and command['start'] == command_terms[1]:
                 response = command['specific_help']
                 break
         else:
             response = 'Unknown game of life help command. Use "gol help" to get a list of commands.'
-    return response
+    return {'output': response}
 
-def _gol(client, message, user_command):
+def _gol(client, message, user_command, iteration):
     command_terms = user_command.split(' ')[1:]
-    response = ''
-    if command_terms[0] == 'help':
-        response = _gol_help_handler(command_terms)
+    if not len(command_terms) or command_terms[0] == 'help':
+        return _gol_help_handler(client, message, command_terms)
     else:
         for command in GOL_COMMANDS:
             if command['start'] == command_terms[0].lower():
-                response = command['func'](command_terms, str(message.server))
-    return client.send_message(message.channel, response)
+                return command['func'](client, message, command_terms, iteration)
 
 COMMANDS.append({
     'start': 'gol',

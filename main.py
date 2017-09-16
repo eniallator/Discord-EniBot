@@ -9,6 +9,17 @@ CLIENT = discord.Client()
 LOG_USER = {}
 LOG_USER['name'] = 'eniallator#4937'
 
+PROGRESS_MESSAGE = {}
+PROGRESS_MESSAGE['format'] = lambda curr, limit: 'Progress: ' + str(curr / limit * 100) + '%'
+
+
+async def _send_progress(message, curr, limit):
+    if PROGRESS_MESSAGE['new_message']:
+        PROGRESS_MESSAGE['new_message'] = False
+        PROGRESS_MESSAGE['message'] = await CLIENT.send_message(message.channel, PROGRESS_MESSAGE['format'](curr, limit))
+    else:
+        PROGRESS_MESSAGE['message'] = await CLIENT.edit_message(PROGRESS_MESSAGE['message'], PROGRESS_MESSAGE['format'](curr, limit))
+
 
 def _get_time():
     raw_time = strftime("%Y/%m/%d %H:%M:%S", gmtime())
@@ -32,9 +43,24 @@ def _help_response(message, user_command):
 async def _command_handler(message, user_command):
     for command in COMMANDS:
         if user_command.lower().split(' ')[0] == command['start']:
-            return command['func'](CLIENT, message, user_command)
+            response = {}
+            iteration = 0
+            PROGRESS_MESSAGE['new_message'] = True
+
+            while not 'output' in response:
+                response = command['func'](CLIENT, message, user_command, iteration)
+                if 'output' in response:
+                    await CLIENT.send_message(message.channel, response['output'])
+                else:
+                    await _send_progress(message, iteration + 1, response['limit'])
+                iteration += 1
+            
+            if 'message' in PROGRESS_MESSAGE:
+                await CLIENT.delete_message(PROGRESS_MESSAGE['message'])
+            
+            return response['output']
     else:
-        return CLIENT.send_message(message.channel, 'Unknown command. Use "help" to get a list of commands.')
+        return await CLIENT.send_message(message.channel, 'Unknown command. Use "help" to get a list of commands.')
 
 
 @CLIENT.event
