@@ -1,5 +1,6 @@
 """My EniBot command list. If you have an idea for a command, get in touch!"""
 from GOL_Sim.GOL_Simulation import GOL_Simulation
+import re
 
 COMMANDS = []
 
@@ -21,6 +22,32 @@ COMMANDS.append({
     'start': 'source_code',
     'help': 'Replies with the source code link.',
     'func': _source_code
+})
+
+
+NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+EMOJI_TRANSLATIONS = {
+    '\s': lambda char: ':white_large_square: ',
+    '[a-z]': lambda char: ':regional_indicator_' + char + ': ',
+    '[0-9]': lambda char: ':' + NUMBER_WORDS[int(char)] + ': '
+}
+
+
+def _emojify(client, message, user_command, iteration):
+    emoji_text = ''
+    input_text = ' '.join(user_command.split(' ')[1:])
+    for match in re.finditer('[a-z0-9\s]', input_text.lower()):
+        char = match.group(0)
+        for regex in EMOJI_TRANSLATIONS:
+            if re.match(regex, char):
+                emoji_text += EMOJI_TRANSLATIONS[regex](char)
+                break
+    return {'output': emoji_text}
+
+COMMANDS.append({
+    'start': 'emojify',
+    'help': 'Generates emojis from the input text.',
+    'func': _emojify
 })
 
 
