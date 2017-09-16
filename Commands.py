@@ -106,7 +106,7 @@ def _gol_cycle(client, message, command_terms, iteration):
             response['limit'] = int(command_terms[1])
             if 1 <= response['limit'] <= GOL_MAX_CYCLES:
                 output = _cycle_instance(GOL_INSTANCES[str(message.server)])
-                if iteration >= response['limit']:
+                if iteration + 1 >= response['limit']:
                     output_message = output
             else:
                 output_message = 'Limit out of range. Choose an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
