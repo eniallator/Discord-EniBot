@@ -30,8 +30,8 @@ EMOJI_TRANSLATIONS = {
     '\s': lambda char: ':white_large_square: ',
     'a-z': lambda char: ':regional_indicator_' + char + ': ',
     '0-9': lambda char: ':' + NUMBER_WORDS[int(char)] + ': ',
-    '\?': lambda char: ':question: ',
-    '\!': lambda char: ':exclamation: '
+    '?': lambda char: ':question: ',
+    '!': lambda char: ':exclamation: '
 }
 
 
@@ -45,6 +45,8 @@ def _emojify(client, message, user_command, iteration):
             if re.match('[' + regex + ']', char):
                 emoji_text += EMOJI_TRANSLATIONS[regex](char)
                 break
+    if not emoji_text:
+        emoji_text = 'Bad input. Can only handle characters that ' + regex_all + ' picks up.'
     return {'output': emoji_text}
 
 COMMANDS.append({
