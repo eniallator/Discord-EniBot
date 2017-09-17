@@ -29,7 +29,9 @@ NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', '
 EMOJI_TRANSLATIONS = {
     '\s': lambda char: ':white_large_square: ',
     'a-z': lambda char: ':regional_indicator_' + char + ': ',
-    '0-9': lambda char: ':' + NUMBER_WORDS[int(char)] + ': '
+    '0-9': lambda char: ':' + NUMBER_WORDS[int(char)] + ': ',
+    '\?': lambda char: ':question: ',
+    '\!': lambda char: ':exclamation: '
 }
 
 
