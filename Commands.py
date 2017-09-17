@@ -57,26 +57,37 @@ GOL_MAX_PROCESSING = 75 ** 50 * (10 * 10)
 GOL_MAX_CYCLES = 25
 
 
-def _gol_new(client, message, command_terms, iteration):
-    args = command_terms[1:]
-    response = ''
-    for index, term in enumerate(args):
+def _numberify(terms):
+    num_terms = []
+    for index, term in enumerate(terms):
         try:
             if '.' in term:
-                args[index] = float(term)
+                num_terms.append(float(term))
             else:
-                args[index] = int(term)
-        except:
-            response += 'The term at index ' + str(index + 2) + ' has to be a number.\n'
+                num_terms.append(int(term))
+        except ValueError:
+            return index
+    return num_terms
+
+def _gol_new_validate(args):
+    default_vals = [50, 5, 5, 30]
+    intensive_args = [args[i] if len(args) > i else val for i, val in enumerate(default_vals)]
+    accumulator = intensive_args[0] ** intensive_args[1] * (intensive_args[1] * intensive_args[2])
+    if accumulator <= GOL_MAX_PROCESSING:
+        return True
+
+def _gol_new(client, message, command_terms, iteration):
+    string_args = command_terms[1:]
+    args = _numberify(string_args)
+    response = ''
     
-    if len(args) > 6:
+    if isinstance(args, int):
+        response += 'The term at index ' + str(args + 2) + ' has to be a number.\n'
+    elif len(args) > 6:
         response += 'Expecting 6 or less terms.'
     
     if not response and str(message.server):
-        default_vals = [50, 5, 5, 30]
-        intensive_args = [args[i] if len(args) > i else val for i, val in enumerate(default_vals)]
-        accumulator = intensive_args[0] ** intensive_args[1] * (intensive_args[1] * intensive_args[2])
-        if accumulator <= GOL_MAX_PROCESSING:
+        if _gol_new_validate(args):
             if str(message.server) in GOL_INSTANCES:
                 del GOL_INSTANCES[str(message.server)]
             try:
