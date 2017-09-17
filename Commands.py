@@ -28,7 +28,7 @@ COMMANDS.append({
 NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
 EMOJI_TRANSLATIONS = {
     '\s': lambda char: ':white_large_square: ',
-    'a-z': lambda char: ':regional_indicator_' + char + ': ',
+    'a-zA-Z': lambda char: ':regional_indicator_' + char.lower() + ': ',
     '0-9': lambda char: ':' + NUMBER_WORDS[int(char)] + ': ',
     '?': lambda char: ':question: ',
     '!': lambda char: ':exclamation: '
@@ -39,7 +39,7 @@ def _emojify(client, message, user_command, iteration):
     emoji_text = ''
     input_text = ' '.join(user_command.split(' ')[1:])
     regex_all = '[' + ''.join(EMOJI_TRANSLATIONS.keys()) + ']'
-    for match in re.finditer(regex_all, input_text.lower()):
+    for match in re.finditer(regex_all, input_text):
         char = match.group(0)
         for regex in EMOJI_TRANSLATIONS:
             if re.match('[' + regex + ']', char):
