@@ -51,7 +51,7 @@ def _emojify(client, message, user_command, iteration):
 
 COMMANDS.append({
     'start': 'emojify',
-    'help': 'Generates emojis from the input text.',
+    'help': 'Generates emojis from the input text based on the following regex: [' + ''.join(EMOJI_TRANSLATIONS.keys()) + ']',
     'func': _emojify
 })
 

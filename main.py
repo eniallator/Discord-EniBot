@@ -57,6 +57,7 @@ async def _command_handler(message, user_command):
             
             if 'message' in PROGRESS_MESSAGE:
                 await CLIENT.delete_message(PROGRESS_MESSAGE['message'])
+                del PROGRESS_MESSAGE['message']
             
             return response['output']
     else:
