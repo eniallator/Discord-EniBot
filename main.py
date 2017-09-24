@@ -10,7 +10,7 @@ LOG_USER = {}
 LOG_USER['name'] = 'eniallator#4937'
 
 PROGRESS_MESSAGE = {}
-PROGRESS_MESSAGE['format'] = lambda curr, limit: 'Progress: ' + str(curr / limit * 100) + '%'
+PROGRESS_MESSAGE['format'] = lambda curr, limit: 'Progress: ' + str(curr / limit * 100)[:5] + '%'
 
 
 async def _send_progress(message, curr, limit):
@@ -47,7 +47,7 @@ async def _command_handler(message, user_command):
             iteration = 0
             PROGRESS_MESSAGE['new_message'] = True
 
-            while not 'output' in response:
+            while 'output' not in response:
                 response = command['func'](CLIENT, message, user_command, iteration)
                 if 'output' in response:
                     await CLIENT.send_message(message.channel, response['output'])
@@ -76,7 +76,7 @@ async def on_ready():
 async def on_message(message):
     """Handles any user commands"""
     prefix = '<@' + CLIENT.user.id + '> '
-    if str(message.channel) == 'bot_testing' and not message.author.bot and message.content.startswith(prefix):
+    if not message.author.bot and message.content.startswith(prefix):
         user_command = message.content.replace(prefix, '', 1)
         await _log(str(message.author) + ' ran: "' + user_command + '" in server: ' + message.server.name)
         if user_command.lower().split(' ')[0] == 'help':
