@@ -86,7 +86,9 @@ def _gol_new(client, message, command_terms, iteration):
     args = _numberify(string_args)
     response = ''
     
-    if isinstance(args, int):
+    if not message.server:
+        response = 'GOL commands will only work on a server.'
+    elif isinstance(args, int):
         response += 'The term at index ' + str(args + 2) + ' has to be a number.\n'
     elif len(args) > 6:
         response += 'Expecting 6 or less terms.'
@@ -102,8 +104,6 @@ def _gol_new(client, message, command_terms, iteration):
                 response = 'All arguments have to be integers except for mutation chance which is a float.'
         else:
             response = 'Max processing exceeded. Please choose smaller input arguments.'
-    elif not str(message.server):
-        response = 'Instances can only be created on servers.'
     
     return {'output': response}
 
