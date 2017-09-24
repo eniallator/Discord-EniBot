@@ -78,7 +78,13 @@ async def on_message(message):
     prefix = '<@' + CLIENT.user.id + '> '
     if not message.author.bot and message.content.startswith(prefix):
         user_command = message.content.replace(prefix, '', 1)
-        await _log(str(message.author) + ' ran: "' + user_command + '" in server: ' + message.server.name)
+        log_message = str(message.author) + ' ran: "' + user_command + '"'
+        if message.server:
+            log_message += ' in server: ' + message.server.name
+        else:
+            log_message += ' in a private message'
+        await _log(log_message)
+
         if user_command.lower().split(' ')[0] == 'help':
             await _help_response(message, user_command)
         else:
