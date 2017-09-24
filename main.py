@@ -70,20 +70,28 @@ async def on_ready():
     for member in CLIENT.get_all_members():
         if str(member) == LOG_USER['name']:
             LOG_USER['member'] = member
-    await _log('Bot logged in with name: "' + CLIENT.user.name + '" and id: ' + CLIENT.user.id + '\n', True)
+    await _log('Bot logged in with name: "' + CLIENT.user.name + '" and id: ' + CLIENT.user.id + '\n', first_log=True)
 
 @CLIENT.event
 async def on_message(message):
     """Handles any user commands"""
     prefix = '<@' + CLIENT.user.id + '> '
-    if not message.author.bot and message.content.startswith(prefix):
+    user_command = ''
+    if message.content.startswith(prefix):
+        user_command = message.content.replace(prefix, '', 1)
+    elif not message.server:
+        user_command = message.content
+
+    if not message.author.bot and user_command:
         user_command = message.content.replace(prefix, '', 1)
         log_message = str(message.author) + ' ran: "' + user_command + '"'
         if message.server:
             log_message += ' in server: ' + message.server.name
         else:
             log_message += ' in a private message'
-        await _log(log_message)
+        log_routine = _log(log_message)
+        if LOG_USER['name'] != str(message.author) or message.server:
+            await log_routine
 
         if user_command.lower().split(' ')[0] == 'help':
             await _help_response(message, user_command)
