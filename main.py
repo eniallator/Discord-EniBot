@@ -1,8 +1,18 @@
 """My EniBot main script. Handles commands however won't store them (with exception of help)"""
+import sys
 from time import gmtime, strftime
 import discord
-import Credentials
 from Commands import COMMANDS
+
+TOKEN = None
+
+try:
+    from Credentials import TOKEN
+except ModuleNotFoundError:
+    if len(sys.argv) > 1:
+        TOKEN = sys.argv[1]
+    else:
+        raise Exception('Specify discord token either with a credentials.py file or as an argument.')
 
 CLIENT = discord.Client()
 
@@ -98,4 +108,4 @@ async def on_message(message):
         else:
             await _command_handler(message, user_command)
 
-CLIENT.run(Credentials.TOKEN)
+CLIENT.run(TOKEN)
