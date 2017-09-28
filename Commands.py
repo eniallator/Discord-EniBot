@@ -58,7 +58,7 @@ COMMANDS.append({
 
 GOL_COMMANDS = []
 GOL_INSTANCES = {}
-GOL_MAX_PROCESSING = 75 ** 50 * (10 * 10)
+GOL_MAX_PROCESSING = 50 ** 50 * (7 * 7)
 GOL_MAX_CYCLES = 25
 
 
@@ -77,7 +77,7 @@ def _numberify(terms):
 def _gol_new_validate(args):
     default_vals = [50, 5, 5, 30]
     intensive_args = [args[i] if len(args) > i else val for i, val in enumerate(default_vals)]
-    accumulator = intensive_args[0] ** intensive_args[1] * (intensive_args[1] * intensive_args[2])
+    accumulator = intensive_args[0] ** intensive_args[3] * (intensive_args[1] * intensive_args[2])
     if accumulator <= GOL_MAX_PROCESSING:
         return True
 
