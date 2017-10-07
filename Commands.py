@@ -27,31 +27,51 @@ COMMANDS.append({
 
 NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
 EMOJI_TRANSLATIONS = {
-    '\s': lambda char: ':white_large_square: ',
-    'a-zA-Z': lambda char: ':regional_indicator_' + char.lower() + ': ',
-    '0-9': lambda char: ':' + NUMBER_WORDS[int(char)] + ': ',
-    '?': lambda char: ':question: ',
-    '!': lambda char: ':exclamation: '
+    '[\s]': lambda char, _: {'out': ':white_large_square: '},
+    '[a-zA-Z]': lambda char, _: {'out': ':regional_indicator_' + char.lower() + ': '},
+    '[0-9]': lambda char, _: {'out': ':' + NUMBER_WORDS[int(char)] + ': '},
+    '[?]': lambda char, _: {'out': ':question: '},
+    '[!]': lambda char, _: {'out': ':exclamation: '},
+    '<@[0-9]*>': lambda user_id, message: {'inp': _find_mention(user_id, message)}
 }
 
+
+def _find_mention(user_id, message):
+    print(user_id, [m.id for m in message.mentions])
+    for member in message.mentions:
+        if user_id[2:-1] == member.id:
+            return re.sub('#\d*$', '', str(member))
+    return ''
 
 def _emojify(client, message, user_command, iteration):
     emoji_text = ''
     input_text = ' '.join(user_command.split(' ')[1:])
-    regex_all = '[' + ''.join(EMOJI_TRANSLATIONS.keys()) + ']'
-    for match in re.finditer(regex_all, input_text):
-        char = match.group(0)
+    while input_text:
+        max_val = ''
+        max_regex_key = ''
         for regex in EMOJI_TRANSLATIONS:
-            if re.match('[' + regex + ']', char):
-                emoji_text += EMOJI_TRANSLATIONS[regex](char)
-                break
+            curr_val = re.match('^' + regex, input_text)
+            if curr_val:
+                print(curr_val.group(0))
+            if curr_val and len(curr_val.group(0)) > len(max_val):
+                max_val = curr_val.group(0)
+                max_regex_key = regex
+        if max_regex_key:
+            input_text = input_text[len(max_val) if max_val else 1:]
+            translated_output = EMOJI_TRANSLATIONS[max_regex_key](max_val, message)
+            if 'out' in translated_output:
+                emoji_text += translated_output['out']
+            if 'inp' in translated_output:
+                input_text = translated_output['inp'] + input_text
+        else:
+            input_text = input_text[1:]
     if not emoji_text:
-        emoji_text = 'Bad input. Can only handle characters that ' + regex_all + ' picks up.'
+        emoji_text = 'Bad input. Can only handle characters that ' + ''.join(EMOJI_TRANSLATIONS.keys()) + ' picks up.'
     return {'output': emoji_text}
 
 COMMANDS.append({
     'start': 'emojify',
-    'help': 'Generates emojis from the input text based on the following regex: [' + ''.join(EMOJI_TRANSLATIONS.keys()) + ']',
+    'help': 'Generates emojis from the input text',
     'func': _emojify
 })
 
