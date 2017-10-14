@@ -1,6 +1,7 @@
 """My EniBot command list. If you have an idea for a command, get in touch!"""
-from GOL_Sim.GOL_Simulation import GOL_Simulation
 import re
+import random
+from GOL_Sim.GOL_Simulation import GOL_Simulation
 
 COMMANDS = []
 
@@ -73,6 +74,30 @@ COMMANDS.append({
     'start': 'emojify',
     'help': 'Generates emojis from the input text',
     'func': _emojify
+})
+
+
+def _ran_case(client, message, user_command, iteration):
+    input_text = ' '.join(user_command.split(' ')[1:])
+    ran_case_list = [random.choice([char.lower(), char.upper()]) for char in input_text]
+    return {'output': ''.join(ran_case_list)}
+
+COMMANDS.append({
+    'start': 'ran_case',
+    'help': 'Makes inputted text into it\'s random capitals equivalent like this: tEXt liKE This',
+    'func': _ran_case
+})
+
+
+def _spaces(client, message, user_command, iteration):
+    input_text = ' '.join(user_command.split(' ')[1:])
+    spaces_list = list(re.sub('\s*', '', input_text))
+    return {'output': ' '.join(spaces_list)}
+
+COMMANDS.append({
+    'start': 'spaces',
+    'help': 'Removes existing spaces and puts 1 space in between each character',
+    'func': _spaces
 })
 
 
