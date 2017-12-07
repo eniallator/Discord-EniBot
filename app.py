@@ -1,18 +1,20 @@
 """My EniBot main script. Handles commands however won't store them (with exception of help)"""
 import sys
+import os
 from time import gmtime, strftime
 import discord
 from Commands import COMMANDS
 
-TOKEN = None
+TOKEN = os.environ.get('DISCORD_TOKEN')
 
-try:
-    from Credentials import TOKEN
-except ModuleNotFoundError:
-    if len(sys.argv) > 1:
-        TOKEN = sys.argv[1]
-    else:
-        raise Exception('Specify discord token either with a credentials.py file or as an argument.')
+if not TOKEN:
+    try:
+        from Credentials import TOKEN
+    except ModuleNotFoundError:
+        if len(sys.argv) > 1:
+            TOKEN = sys.argv[1]
+        else:
+            raise Exception('Specify discord token either with a credentials.py file or as an argument.')
 
 CLIENT = discord.Client()
 
