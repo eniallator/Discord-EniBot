@@ -3,7 +3,7 @@ import sys
 import os
 from time import gmtime, strftime
 import discord
-from Commands import COMMANDS
+from src.Commands import COMMANDS
 
 TOKEN = os.environ.get('DISCORD_TOKEN')
 

@@ -2,7 +2,7 @@
 import re
 import random
 from GOL_Sim.GOL_Simulation import GOL_Simulation
-from CommandSystem import CommandSystem
+from src.CommandSystem import CommandSystem
 
 COMMANDS = CommandSystem()
 
