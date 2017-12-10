@@ -46,34 +46,24 @@ def _log(msg_to_log, first_log=False):
         return CLIENT.send_message(LOG_USER['member'], timestamp_msg)
 
 
-def _help_response(message, user_command):
-    response = 'Help displayed in the following format:\n"Command": Help_for_command\n'
-    for command in COMMANDS:
-        response += '\n"' + command['start'] + '": ' + command['help']
-    return CLIENT.send_message(message.channel, response)
+async def _command_handler(user_command, message):
+    response = {}
+    iteration = 0
+    PROGRESS_MESSAGE['new_message'] = True
 
-async def _command_handler(message, user_command):
-    for command in COMMANDS:
-        if user_command.lower().split(' ')[0] == command['start']:
-            response = {}
-            iteration = 0
-            PROGRESS_MESSAGE['new_message'] = True
-
-            while 'output' not in response:
-                response = command['func'](CLIENT, message, user_command, iteration)
-                if 'output' in response:
-                    await CLIENT.send_message(message.channel, response['output'])
-                else:
-                    await _send_progress(message, iteration + 1, response['limit'])
-                iteration += 1
-            
-            if 'message' in PROGRESS_MESSAGE:
-                await CLIENT.delete_message(PROGRESS_MESSAGE['message'])
-                del PROGRESS_MESSAGE['message']
-            
-            return response['output']
-    else:
-        return await CLIENT.send_message(message.channel, 'Unknown command. Use "help" to get a list of commands.')
+    while 'output' not in response:
+        response = await COMMANDS.execute(CLIENT, user_command, message, iteration)
+        if 'output' in response:
+            await CLIENT.send_message(message.channel, response['output'])
+        else:
+            await _send_progress(message, iteration + 1, response['limit'])
+        iteration += 1
+    
+    if 'message' in PROGRESS_MESSAGE:
+        await CLIENT.delete_message(PROGRESS_MESSAGE['message'])
+        del PROGRESS_MESSAGE['message']
+    
+    return response['output']
 
 
 @CLIENT.event
@@ -106,8 +96,10 @@ async def on_message(message):
             await log_routine
 
         if user_command.lower().split(' ')[0] == 'help':
-            await _help_response(message, user_command)
+            help_command = ' '.join(user_command.split(' ')[1:])
+            help_message = COMMANDS.get_help(CLIENT, help_command, message)
+            await CLIENT.send_message(message.channel, help_message)
         else:
-            await _command_handler(message, user_command)
+            await _command_handler(user_command, message)
 
 CLIENT.run(TOKEN)

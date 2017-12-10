@@ -2,28 +2,29 @@
 import re
 import random
 from GOL_Sim.GOL_Simulation import GOL_Simulation
+from CommandSystem import CommandSystem
 
-COMMANDS = []
+COMMANDS = CommandSystem()
 
 
-def _ping(client, message, user_command, iteration):
+async def _ping(client, user_command, message, iteration):
     return {'output': 'Pong!'}
 
-COMMANDS.append({
-    'start': 'ping',
-    'help': 'Replies with "Pong!"',
-    'func': _ping
-})
+COMMANDS.add_command(
+    'ping',
+    cmd_func=_ping,
+    cmd_help=lambda client, user_cmd, message: 'Replies with "Pong!"'
+)
 
 
-def _source_code(client, message, user_command, iteration):
+async def _source_code(client, user_command, message, iteration):
     return {'output': 'https://github.com/eniallator/Discord-EniBot'}
 
-COMMANDS.append({
-    'start': 'source_code',
-    'help': 'Replies with the source code link.',
-    'func': _source_code
-})
+COMMANDS.add_command(
+    'source_code',
+    cmd_func=_source_code,
+    cmd_help=lambda client, user_cmd, message: 'Replies with the source code link.'
+)
 
 
 NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
@@ -44,7 +45,7 @@ def _find_mention(user_id, message):
             return re.sub('#\d*$', '', str(member))
     return ''
 
-def _emojify(client, message, user_command, iteration):
+async def _emojify(client, user_command, message, iteration):
     emoji_text = ''
     input_text = ' '.join(user_command.split(' ')[1:])
     while input_text:
@@ -52,8 +53,6 @@ def _emojify(client, message, user_command, iteration):
         max_regex_key = ''
         for regex in EMOJI_TRANSLATIONS:
             curr_val = re.match('^' + regex, input_text)
-            if curr_val:
-                print(curr_val.group(0))
             if curr_val and len(curr_val.group(0)) > len(max_val):
                 max_val = curr_val.group(0)
                 max_regex_key = regex
@@ -70,38 +69,41 @@ def _emojify(client, message, user_command, iteration):
         emoji_text = 'Bad input. Can only handle characters that ' + ''.join(EMOJI_TRANSLATIONS.keys()) + ' picks up.'
     return {'output': emoji_text}
 
-COMMANDS.append({
-    'start': 'emojify',
-    'help': 'Generates emojis from the input text',
-    'func': _emojify
-})
+COMMANDS.add_command(
+    'emojify',
+    cmd_func=_emojify,
+    cmd_help=lambda client, user_cmd, message: 'Generates emojis from the input text'
+)
 
 
-def _ran_case(client, message, user_command, iteration):
+async def _ran_case(client, user_command, message, iteration):
     input_text = ' '.join(user_command.split(' ')[1:])
     ran_case_list = [random.choice([char.lower(), char.upper()]) for char in input_text]
     return {'output': ''.join(ran_case_list)}
 
-COMMANDS.append({
-    'start': 'ran_case',
-    'help': 'Makes inputted text into it\'s random capitals equivalent like this: tEXt liKE This',
-    'func': _ran_case
-})
+COMMANDS.add_command(
+    'ran_case',
+    cmd_func=_ran_case,
+    cmd_help=lambda client, user_cmd, message: 'Makes inputted text into it\'s random capitals equivalent like this: tEXt liKE This'
+)
 
 
-def _spaces(client, message, user_command, iteration):
+async def _spaces(client, user_command, message, iteration):
     input_text = ' '.join(user_command.split(' ')[1:])
     spaces_list = list(re.sub('\s*', '', input_text))
     return {'output': ' '.join(spaces_list)}
 
-COMMANDS.append({
-    'start': 'spaces',
-    'help': 'Removes existing spaces and puts 1 space in between each character',
-    'func': _spaces
-})
+COMMANDS.add_command(
+    'spaces',
+    cmd_func=_spaces,
+    cmd_help=lambda client, user_cmd, message: 'Removes existing spaces and puts 1 space in between each character'
+)
 
 
-GOL_COMMANDS = []
+COMMANDS.add_command_system(
+    'gol',
+    cmd_help=lambda client, user_cmd, message: 'Game of life genetic algorithm commands.'
+)
 GOL_INSTANCES = {}
 GOL_MAX_PROCESSING = 50 ** 50 * (7 * 7)
 GOL_MAX_CYCLES = 25
@@ -126,7 +128,7 @@ def _gol_new_validate(args):
     if accumulator <= GOL_MAX_PROCESSING:
         return True
 
-def _gol_new(client, message, command_terms, iteration):
+async def _gol_new(client, command_terms, message, iteration):
     string_args = command_terms[1:]
     args = _numberify(string_args)
     response = ''
@@ -152,12 +154,12 @@ def _gol_new(client, message, command_terms, iteration):
     
     return {'output': response}
 
-GOL_COMMANDS.append({
-    'start': 'new',
-    'help': 'Create a new game of life genetic algorithm.',
-    'specific_help': 'Where all arguments are optional and all are numbers.\nDefaults: `size=50, width=5, height=5, iterations=30, mutation_chance=0.025, creatures_to_remain=5`\nUsage: `gol new size width height iterations mutation_chance creatures_to_remain`',
-    'func': _gol_new
-})
+COMMANDS.add_command(
+    ['gol', 'new'],
+    cmd_func=_gol_new,
+    cmd_help=lambda client, user_cmd, message: 'Create a new game of life genetic algorithm.',
+    specific_help=lambda client, user_cmd, message: 'Where all arguments are optional and all are numbers.\nDefaults: `size=50, width=5, height=5, iterations=30, mutation_chance=0.025, creatures_to_remain=5`\nUsage: `gol new size width height iterations mutation_chance creatures_to_remain`'
+)
 
 
 def _validate_gol_instance(server):
@@ -172,21 +174,21 @@ def _cycle_instance(instance):
     instance.evolve_population()
     return response
 
-def _gol_next_cycle(client, message, command_terms, iteration):
+async def _gol_next_cycle(client, command_terms, message, iteration):
     response = _validate_gol_instance(str(message.server))
     if not response:
         response = _cycle_instance(GOL_INSTANCES[str(message.server)])
     return {'output': response}
 
-GOL_COMMANDS.append({
-    'start': 'next_cycle',
-    'help': 'Evolves the population and gives stats for the population.',
-    'specific_help': 'Receives no arguments.\nFirst it will evaluate and then it will get the stats after evaluation and finally evolve the population.',
-    'func': _gol_next_cycle
-})
+COMMANDS.add_command(
+    ['gol', 'next_cycle'],
+    cmd_func=_gol_next_cycle,
+    cmd_help=lambda client, user_cmd, message: 'Evolves the population and gives stats for the population.',
+    specific_help=lambda client, user_cmd, message: 'Receives no arguments.\nFirst it will evaluate and then it will get the stats after evaluation and finally evolve the population.'
+)
 
 
-def _gol_cycle(client, message, command_terms, iteration):
+async def _gol_cycle(client, command_terms, message, iteration):
     response = {}
     output_message = _validate_gol_instance(str(message.server))
     if not output_message:
@@ -204,41 +206,9 @@ def _gol_cycle(client, message, command_terms, iteration):
         response['output'] = output_message
     return response
 
-GOL_COMMANDS.append({
-    'start': 'cycle',
-    'help': 'Evolves the population a number of times and gives stats for the population afterwards.',
-    'specific_help': 'Receives 1 argument; a number from 1-' + str(GOL_MAX_CYCLES) + ' to cycle through the simulation.\n Usage: `gol cycle limit`',
-    'func': _gol_cycle
-})
-
-
-def _gol_help_handler(client, message, command_terms):
-    response = ''
-    if len(command_terms) == 1:
-        response = 'gol help displayed in the following format:\n"gol Command": Help_for_command\n'
-        for command in GOL_COMMANDS:
-            response += '\n"' + command['start'] + '": ' + command['help']
-        response += '\n\nUse `gol help COMMAND` to get more help on specific commands.'
-    else:
-        for command in GOL_COMMANDS:
-            if len(command_terms) > 1 and command['start'] == command_terms[1]:
-                response = command['specific_help']
-                break
-        else:
-            response = 'Unknown game of life help command. Use "gol help" to get a list of commands.'
-    return {'output': response}
-
-def _gol(client, message, user_command, iteration):
-    command_terms = user_command.split(' ')[1:]
-    if not len(command_terms) or command_terms[0] == 'help':
-        return _gol_help_handler(client, message, command_terms)
-    else:
-        for command in GOL_COMMANDS:
-            if command['start'] == command_terms[0].lower():
-                return command['func'](client, message, command_terms, iteration)
-
-COMMANDS.append({
-    'start': 'gol',
-    'help': 'Game of life genetic algorithm commands.',
-    'func': _gol
-})
+COMMANDS.add_command(
+    ['gol', 'cycle'],
+    cmd_func=_gol_cycle,
+    cmd_help=lambda client, user_cmd, message: 'Evolves the population a number of times and gives stats for the population afterwards.',
+    specific_help=lambda client, user_cmd, message: 'Receives 1 argument; a number from 1-' + str(GOL_MAX_CYCLES) + ' to cycle through the simulation.\n Usage: `gol cycle limit`'
+)
