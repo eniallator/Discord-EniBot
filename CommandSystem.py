@@ -52,10 +52,11 @@ class CommandSystem(object):
         else:
             return {'output': 'Unknown command. Use "help" to get a list of commands.'}
     
-    def _gen_help(self):
+    async def _gen_help(self, user_cmd, message):
         help_message = 'Showing help for ' + self._system_name
         for cmd_string in self._commands:
-            help_message += '\n' + cmd_string + ': ' + self._commands[cmd_string]
+            cmd_help = await self._commands[cmd_string]['help'](user_cmd, message)
+            help_message += '\n' + cmd_string + ': ' + cmd_help
         return help_message
 
     async def get_help(self, user_cmd, message):
@@ -65,10 +66,10 @@ class CommandSystem(object):
             if 'command_system' in cmd:
                 return await cmd['command_system'].get_help(' '.join(cmd_args[1:]), message)
             elif 'help' in cmd:
-                return await cmd['help'](user_cmd, message)
+                return await cmd['help'](' '.join(cmd_args[1:]), message)
             else:
                 return {'output': 'Error could not find the command\'s help.'}
         elif not cmd_args:
-            return self._gen_help()
+            return await self._gen_help(' '.join(cmd_args[1:]), message)
         else:
             return {'output': 'Unknown command. Use "help" to get a list of commands.'}
