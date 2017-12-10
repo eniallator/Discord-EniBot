@@ -62,8 +62,8 @@ class CommandSystem(object):
             help_message = 'Showing help for ' + self._system_name + ': '
         for cmd_string in self._commands:
             cmd_help = self._commands[cmd_string]['help'](client, user_cmd, message)
-            help_message += '\n"' + cmd_string + '": ' + cmd_help
-        return help_message + '\nTo learn more about a command, use "help <command>"'
+            help_message += '\n`' + cmd_string + '`: ' + cmd_help
+        return help_message + '\nTo learn more about a command, use `help <command>`'
 
     def get_help(self, client, user_cmd, message):
         cmd_args = user_cmd.split(' ')
