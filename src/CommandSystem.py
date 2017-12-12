@@ -56,21 +56,22 @@ class CommandSystem(object):
                 return {'output': 'Unknown ' + self._system_name + ' system command. Use "help" to get a list of commands.'}
             return {'output': 'Unknown command. Use "help" to get a list of commands.'}
     
-    def _gen_help(self, client, user_cmd, message):
+    def _gen_help(self, client, user_cmd, message, prefix):
         help_message = 'Showing help:'
         if self._system_name:
             help_message = 'Showing help for ' + self._system_name + ': '
         for cmd_string in self._commands:
             cmd_help = self._commands[cmd_string]['help'](client, user_cmd, message)
-            help_message += '\n`' + cmd_string + '`: ' + cmd_help
+            help_message += '\n`' + prefix + cmd_string + '`: ' + cmd_help
         return help_message + '\nTo learn more about a command, use `help <command>`'
 
-    def get_help(self, client, user_cmd, message):
+    def get_help(self, client, user_cmd, message, prefix=''):
         cmd_args = user_cmd.split(' ')
+        new_prefix = prefix + self._system_name + ' '
         if cmd_args and cmd_args[0] in self._commands:
             cmd = self._commands[cmd_args[0]]
             if 'command_system' in cmd:
-                return cmd['command_system'].get_help(client, ' '.join(cmd_args[1:]), message)
+                return cmd['command_system'].get_help(client, ' '.join(cmd_args[1:]), message, prefix=new_prefix)
             elif 'specific_help' in cmd:
                 return cmd['specific_help'](client, ' '.join(cmd_args[1:]), message)
             elif 'help' in cmd:
@@ -78,6 +79,6 @@ class CommandSystem(object):
             else:
                 return 'Error could not find the command\'s help.'
         elif not cmd_args or cmd_args == ['']:
-            return self._gen_help(client, ' '.join(cmd_args[1:]), message)
+            return self._gen_help(client, ' '.join(cmd_args[1:]), message, new_prefix)
         else:
             return 'Unknown command. Use "help" to get a list of commands.'
