@@ -1,22 +1,26 @@
 class CommandSystem(object):
     """The command system class"""
+
     def __init__(self, system_name=''):
         self._system_name = system_name
         self._commands = {}
 
     def _validate_add_command(self, cmd_string):
+        """Validates the add command/command system methods"""
         if not isinstance(cmd_string, str) or not cmd_string:
             raise ValueError('Command needs to have 1 or more characters.')
         if cmd_string in self._commands:
             raise ValueError('Command already exists.')
 
     def _validate_command_system_path(self, cmd_string):
+        """Validates that the given command system exists"""
         if not isinstance(cmd_string, str) or not cmd_string:
             raise ValueError('Error when locating the path to the command system when adding a new command.')
         if not (cmd_string in self._commands and 'command_system' in self._commands[cmd_string]):
             raise ValueError('Could not find command system when adding a new command.')
 
     def add_command(self, cmd, cmd_func=lambda client, user_cmd, message, iteration: {'output': ''}, cmd_help=lambda client, user_cmd, message: {'output': ''}, specific_help=None):
+        """Adds a command to the current command system"""
         command_value = {'func': cmd_func, 'help': cmd_help}
         if specific_help:
             command_value['specific_help'] = specific_help
@@ -36,12 +40,14 @@ class CommandSystem(object):
             raise ValueError('First argument has to be a string or a list when adding a command.')
     
     def add_command_system(self, cmd_string, cmd_help=lambda client, user_cmd, message: {'output': ''}, cmd_system=None):
+        """Adds a command system within the current command system"""
         if not isinstance(cmd_system, CommandSystem):
             cmd_system = CommandSystem(cmd_string)
         self._validate_add_command(cmd_string)
         self._commands[cmd_string] = {'command_system': cmd_system, 'help': cmd_help}
     
     async def execute(self, client, user_cmd, message, iteration):
+        """Executes the desired command (whether it is within child command system or not) with arguments"""
         cmd_args = user_cmd.split(' ')
         if cmd_args and cmd_args[0] in self._commands:
             cmd = self._commands[cmd_args[0]]
@@ -57,6 +63,7 @@ class CommandSystem(object):
             return {'output': 'Unknown command. Use "help" to get a list of commands.'}
     
     def _gen_help(self, client, user_cmd, message, prefix):
+        """Generates the help for the command system"""
         help_message = 'Showing help:'
         if self._system_name:
             help_message = 'Showing help for ' + self._system_name + ': '
@@ -66,6 +73,7 @@ class CommandSystem(object):
         return help_message + '\nTo learn more about a command, use `help <command>`'
 
     def get_help(self, client, user_cmd, message, prefix=''):
+        """Makes the help for this command system/a child command system and messages it back"""
         cmd_args = user_cmd.split(' ')
         new_prefix = prefix + self._system_name + ' '
         if cmd_args and cmd_args[0] in self._commands:
