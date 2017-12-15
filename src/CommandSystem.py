@@ -1,3 +1,6 @@
+# pytest for unit testing
+# patch for default unit testing package
+
 class CommandSystem(object):
     """The command system class"""
 
@@ -46,15 +49,15 @@ class CommandSystem(object):
         self._validate_add_command(cmd_string)
         self._commands[cmd_string] = {'command_system': cmd_system, 'help': cmd_help}
     
-    async def execute(self, client, user_cmd, message, iteration):
+    async def execute(self, cmd_to_execute, client, user_cmd, message, iteration):
         """Executes the desired command (whether it is within child command system or not) with arguments"""
-        cmd_args = user_cmd.split(' ')
+        cmd_args = cmd_to_execute.split(' ')
         if cmd_args and cmd_args[0] in self._commands:
             cmd = self._commands[cmd_args[0]]
             if 'func' in cmd:
                 return await cmd['func'](client, user_cmd, message, iteration)
             elif 'command_system' in cmd:
-                return await cmd['command_system'].execute(client, ' '.join(cmd_args[1:]), message, iteration)
+                return await cmd['command_system'].execute(' '.join(cmd_args[1:]), client, user_cmd, message, iteration)
             else:
                 return {'output': 'Error could not find a callable in the command object.'}
         else:

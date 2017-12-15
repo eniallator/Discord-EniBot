@@ -129,7 +129,8 @@ def _gol_new_validate(args):
         return True
 
 async def _gol_new(client, command_terms, message, iteration):
-    string_args = command_terms[1:]
+    print(command_terms)
+    string_args = command_terms.split(' ')[2:]
     args = _numberify(string_args)
     response = ''
     
@@ -193,7 +194,7 @@ async def _gol_cycle(client, command_terms, message, iteration):
     output_message = _validate_gol_instance(str(message.server))
     if not output_message:
         try:
-            response['limit'] = int(command_terms[1])
+            response['limit'] = int(command_terms.split(' ')[2])
             if 1 <= response['limit'] <= GOL_MAX_CYCLES:
                 output = _cycle_instance(GOL_INSTANCES[str(message.server)])
                 if iteration + 1 >= response['limit']:

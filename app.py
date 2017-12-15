@@ -52,7 +52,7 @@ async def _command_handler(user_command, message):
     PROGRESS_MESSAGE['new_message'] = True
 
     while 'output' not in response:
-        response = await COMMANDS.execute(CLIENT, user_command, message, iteration)
+        response = await COMMANDS.execute(user_command, CLIENT, user_command, message, iteration)
         if 'output' in response:
             await CLIENT.send_message(message.channel, response['output'])
         else:
