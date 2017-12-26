@@ -1,6 +1,8 @@
 # pytest for unit testing
 # patch for default unit testing package
 
+# add capitalization optional parameter to specify for each command defaulted to not sensitive
+
 class CommandSystem(object):
     """The command system class"""
 
@@ -22,7 +24,7 @@ class CommandSystem(object):
         if not (cmd_string in self._commands and 'command_system' in self._commands[cmd_string]):
             raise ValueError('Could not find command system when adding a new command.')
 
-    def add_command(self, cmd, cmd_func=lambda client, user_cmd, message, iteration: {'output': ''}, cmd_help=lambda client, user_cmd, message: {'output': ''}, specific_help=None):
+    def add_command(self, cmd, cmd_func=lambda client, user_cmd, message: '', cmd_help=lambda client, user_cmd, message: '', specific_help=None):
         """Adds a command to the current command system"""
         command_value = {'func': cmd_func, 'help': cmd_help}
         if specific_help:
@@ -42,28 +44,28 @@ class CommandSystem(object):
         else:
             raise ValueError('First argument has to be a string or a list when adding a command.')
     
-    def add_command_system(self, cmd_string, cmd_help=lambda client, user_cmd, message: {'output': ''}, cmd_system=None):
+    def add_command_system(self, cmd_string, cmd_help=lambda client, user_cmd, message: '', cmd_system=None):
         """Adds a command system within the current command system"""
         if not isinstance(cmd_system, CommandSystem):
             cmd_system = CommandSystem(cmd_string)
         self._validate_add_command(cmd_string)
         self._commands[cmd_string] = {'command_system': cmd_system, 'help': cmd_help}
     
-    async def execute(self, cmd_to_execute, client, user_cmd, message, iteration):
+    async def execute(self, cmd_to_execute, client, user_cmd, message):
         """Executes the desired command (whether it is within child command system or not) with arguments"""
         cmd_args = cmd_to_execute.split(' ')
         if cmd_args and cmd_args[0] in self._commands:
             cmd = self._commands[cmd_args[0]]
             if 'func' in cmd:
-                return await cmd['func'](client, user_cmd, message, iteration)
+                return await cmd['func'](client, user_cmd, message)
             elif 'command_system' in cmd:
-                return await cmd['command_system'].execute(' '.join(cmd_args[1:]), client, user_cmd, message, iteration)
+                return await cmd['command_system'].execute(' '.join(cmd_args[1:]), client, user_cmd, message)
             else:
-                return {'output': 'Error could not find a callable in the command object.'}
+                return 'Error could not find a callable in the command object.'
         else:
             if self._system_name:
-                return {'output': 'Unknown ' + self._system_name + ' system command. Use "help" to get a list of commands.'}
-            return {'output': 'Unknown command. Use "help" to get a list of commands.'}
+                return 'Unknown ' + self._system_name + ' system command. Use "help" to get a list of commands.'
+            return 'Unknown command. Use "help" to get a list of commands.'
     
     def _gen_help(self, client, user_cmd, message, prefix):
         """Generates the help for the command system"""

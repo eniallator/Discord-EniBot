@@ -21,18 +21,6 @@ CLIENT = discord.Client()
 LOG_USER = {}
 LOG_USER['name'] = 'eniallator#4937'
 
-PROGRESS_MESSAGE = {}
-PROGRESS_MESSAGE['format'] = lambda curr, limit: 'Progress: ' + str(curr / limit * 100)[:5] + '%'
-
-
-async def _send_progress(message, curr, limit):
-    if PROGRESS_MESSAGE['new_message']:
-        PROGRESS_MESSAGE['new_message'] = False
-        PROGRESS_MESSAGE['message'] = await CLIENT.send_message(message.channel, PROGRESS_MESSAGE['format'](curr, limit))
-    else:
-        PROGRESS_MESSAGE['message'] = await CLIENT.edit_message(PROGRESS_MESSAGE['message'], PROGRESS_MESSAGE['format'](curr, limit))
-
-
 def _get_time():
     raw_time = strftime("%Y/%m/%d %H:%M:%S", gmtime())
     return '[' + raw_time + '] '
@@ -44,26 +32,6 @@ def _log(msg_to_log, first_log=False):
     print(timestamp_msg)
     if 'member' in LOG_USER:
         return CLIENT.send_message(LOG_USER['member'], timestamp_msg)
-
-
-async def _command_handler(user_command, message):
-    response = {}
-    iteration = 0
-    PROGRESS_MESSAGE['new_message'] = True
-
-    while 'output' not in response:
-        response = await COMMANDS.execute(user_command, CLIENT, user_command, message, iteration)
-        if 'output' in response:
-            await CLIENT.send_message(message.channel, response['output'])
-        else:
-            await _send_progress(message, iteration + 1, response['limit'])
-        iteration += 1
-    
-    if 'message' in PROGRESS_MESSAGE:
-        await CLIENT.delete_message(PROGRESS_MESSAGE['message'])
-        del PROGRESS_MESSAGE['message']
-    
-    return response['output']
 
 
 @CLIENT.event
@@ -100,6 +68,7 @@ async def on_message(message):
             help_message = COMMANDS.get_help(CLIENT, help_command, message)
             await CLIENT.send_message(message.channel, help_message)
         else:
-            await _command_handler(user_command, message)
+            response = await COMMANDS.execute(user_command, CLIENT, user_command, message)
+            await CLIENT.send_message(message.channel, response)
 
 CLIENT.run(TOKEN)

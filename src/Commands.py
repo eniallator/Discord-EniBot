@@ -7,8 +7,8 @@ from src.CommandSystem import CommandSystem
 COMMANDS = CommandSystem()
 
 
-async def _ping(client, user_command, message, iteration):
-    return {'output': 'Pong!'}
+async def _ping(client, user_command, message):
+    return 'Pong!'
 
 COMMANDS.add_command(
     'ping',
@@ -17,8 +17,8 @@ COMMANDS.add_command(
 )
 
 
-async def _source_code(client, user_command, message, iteration):
-    return {'output': 'https://github.com/eniallator/Discord-EniBot'}
+async def _source_code(client, user_command, message):
+    return 'https://github.com/eniallator/Discord-EniBot'
 
 COMMANDS.add_command(
     'source_code',
@@ -45,7 +45,7 @@ def _find_mention(user_id, message):
             return re.sub('#\d*$', '', str(member))
     return ''
 
-async def _emojify(client, user_command, message, iteration):
+async def _emojify(client, user_command, message):
     emoji_text = ''
     input_text = ' '.join(user_command.split(' ')[1:])
     while input_text:
@@ -65,9 +65,9 @@ async def _emojify(client, user_command, message, iteration):
                 input_text = translated_output['inp'] + input_text
         else:
             input_text = input_text[1:]
-    if not emoji_text:
-        emoji_text = 'Bad input. Can only handle characters that ' + ''.join(EMOJI_TRANSLATIONS.keys()) + ' picks up.'
-    return {'output': emoji_text}
+    if emoji_text:
+        return emoji_text
+    return 'Bad input. Can only handle characters that ' + ''.join(EMOJI_TRANSLATIONS.keys()) + ' picks up.'
 
 COMMANDS.add_command(
     'emojify',
@@ -76,10 +76,10 @@ COMMANDS.add_command(
 )
 
 
-async def _ran_case(client, user_command, message, iteration):
+async def _ran_case(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
     ran_case_list = [random.choice([char.lower(), char.upper()]) for char in input_text]
-    return {'output': ''.join(ran_case_list)}
+    return ''.join(ran_case_list)
 
 COMMANDS.add_command(
     'ran_case',
@@ -88,10 +88,10 @@ COMMANDS.add_command(
 )
 
 
-async def _spaces(client, user_command, message, iteration):
+async def _spaces(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
     spaces_list = list(re.sub('\s*', '', input_text))
-    return {'output': ' '.join(spaces_list)}
+    return ' '.join(spaces_list)
 
 COMMANDS.add_command(
     'spaces',
@@ -128,7 +128,7 @@ def _gol_new_validate(args):
     if accumulator <= GOL_MAX_PROCESSING:
         return True
 
-async def _gol_new(client, command_terms, message, iteration):
+async def _gol_new(client, command_terms, message):
     print(command_terms)
     string_args = command_terms.split(' ')[2:]
     args = _numberify(string_args)
@@ -153,7 +153,7 @@ async def _gol_new(client, command_terms, message, iteration):
         else:
             response = 'Max processing exceeded. Please choose smaller input arguments.'
     
-    return {'output': response}
+    return response
 
 COMMANDS.add_command(
     ['gol', 'new'],
@@ -175,11 +175,11 @@ def _cycle_instance(instance):
     instance.evolve_population()
     return response
 
-async def _gol_next_cycle(client, command_terms, message, iteration):
+async def _gol_next_cycle(client, command_terms, message):
     response = _validate_gol_instance(str(message.server))
     if not response:
         response = _cycle_instance(GOL_INSTANCES[str(message.server)])
-    return {'output': response}
+    return response
 
 COMMANDS.add_command(
     ['gol', 'next_cycle'],
@@ -189,22 +189,34 @@ COMMANDS.add_command(
 )
 
 
-async def _gol_cycle(client, command_terms, message, iteration):
-    response = {}
-    output_message = _validate_gol_instance(str(message.server))
-    if not output_message:
+PROGRESS_MESSAGE = {}
+PROGRESS_MESSAGE['format'] = lambda curr, limit: 'Progress: ' + str(curr / limit * 100)[:5] + '%'
+
+async def _send_progress(client, message, curr, limit):
+    if PROGRESS_MESSAGE['new_message']:
+        PROGRESS_MESSAGE['new_message'] = False
+        PROGRESS_MESSAGE['message'] = await client.send_message(message.channel, PROGRESS_MESSAGE['format'](curr, limit))
+    else:
+        PROGRESS_MESSAGE['message'] = await client.edit_message(PROGRESS_MESSAGE['message'], PROGRESS_MESSAGE['format'](curr, limit))
+
+async def _gol_cycle(client, command_terms, message):
+    response = ''
+    response = _validate_gol_instance(str(message.server))
+    PROGRESS_MESSAGE['new_message'] = True
+    if not response:
         try:
-            response['limit'] = int(command_terms.split(' ')[2])
-            if 1 <= response['limit'] <= GOL_MAX_CYCLES:
-                output = _cycle_instance(GOL_INSTANCES[str(message.server)])
-                if iteration + 1 >= response['limit']:
-                    output_message = output
+            max_iterations = int(command_terms.split(' ')[2])
+            if 1 <= max_iterations <= GOL_MAX_CYCLES:
+                for i in range(max_iterations):
+                    response = _cycle_instance(GOL_INSTANCES[str(message.server)])
+                    if i < max_iterations - 1:
+                        await _send_progress(client, message, i + 1, max_iterations)
+                if PROGRESS_MESSAGE['message']:
+                    await client.delete_message(PROGRESS_MESSAGE['message'])
             else:
-                output_message = 'Limit out of range. Choose an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
+                response = 'Limit out of range. Choose an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
         except ValueError:
-            output_message = 'The second argument has to be an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
-    if output_message:
-        response['output'] = output_message
+            response = 'The second argument has to be an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
     return response
 
 COMMANDS.add_command(
