@@ -1,4 +1,4 @@
-"""My EniBot main script. Handles commands however won't store them (with exception of help)"""
+"""My EniBot main script"""
 import sys
 import os
 from time import gmtime, strftime
