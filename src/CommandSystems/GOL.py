@@ -53,7 +53,7 @@ async def _gol_new(client, command_terms, message):
         else:
             response = 'Max processing exceeded. Please choose smaller input arguments.'
     
-    return response
+    await client.send_message(message.channel, response)
 
 GOL_COMMANDS.add_command(
     'new',
@@ -79,7 +79,7 @@ async def _gol_next_cycle(client, command_terms, message):
     response = _validate_gol_instance(str(message.server))
     if not response:
         response = _cycle_instance(GOL_INSTANCES[str(message.server)])
-    return response
+    await client.send_message(message.channel, response)
 
 GOL_COMMANDS.add_command(
     'next_cycle',
@@ -117,7 +117,7 @@ async def _gol_cycle(client, command_terms, message):
                 response = 'Limit out of range. Choose an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
         except ValueError:
             response = 'The second argument has to be an integer between 1-' + str(GOL_MAX_CYCLES) + '.'
-    return response
+    await client.send_message(message.channel, response)
 
 GOL_COMMANDS.add_command(
     'cycle',

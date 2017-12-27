@@ -69,8 +69,7 @@ async def on_message(message):
             help_message = COMMANDS.get_help(CLIENT, help_command, message)
             await CLIENT.send_message(message.channel, help_message)
         else:
-            response = await COMMANDS.execute(user_command, CLIENT, user_command, message)
-            await CLIENT.send_message(message.channel, response)
+            await COMMANDS.execute(user_command, CLIENT, user_command, message)
 
 
 CLIENT.run(TOKEN)

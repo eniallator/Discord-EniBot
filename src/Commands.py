@@ -13,7 +13,7 @@ COMMANDS.add_command_system(
 )
 
 async def _ping(client, user_command, message):
-    return 'Pong!'
+    await client.send_message(message.channel, 'Pong!')
 
 COMMANDS.add_command(
     'ping',
@@ -23,7 +23,7 @@ COMMANDS.add_command(
 
 
 async def _source_code(client, user_command, message):
-    return 'https://github.com/eniallator/Discord-EniBot'
+    await client.send_message(message.channel, 'https://github.com/eniallator/Discord-EniBot')
 
 COMMANDS.add_command(
     'source_code',
@@ -71,8 +71,9 @@ async def _emojify(client, user_command, message):
         else:
             input_text = input_text[1:]
     if emoji_text:
+        await client.send_message(message.channel, emoji_text)
         return emoji_text
-    return 'Bad input. Can only handle characters that ' + ''.join(EMOJI_TRANSLATIONS.keys()) + ' picks up.'
+    await client.send_message(message.channel, 'Bad input. Can only handle characters that ' + ''.join(EMOJI_TRANSLATIONS.keys()) + ' picks up.')
 
 COMMANDS.add_command(
     'emojify',
@@ -84,7 +85,7 @@ COMMANDS.add_command(
 async def _ran_case(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
     ran_case_list = [random.choice([char.lower(), char.upper()]) for char in input_text]
-    return ''.join(ran_case_list)
+    await client.send_message(message.channel, ''.join(ran_case_list))
 
 COMMANDS.add_command(
     'ran_case',
@@ -96,7 +97,7 @@ COMMANDS.add_command(
 async def _spaces(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
     spaces_list = list(re.sub('\s*', '', input_text))
-    return ' '.join(spaces_list)
+    await client.send_message(message.channel, ' '.join(spaces_list))
 
 COMMANDS.add_command(
     'spaces',
