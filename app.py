@@ -16,7 +16,9 @@ if not TOKEN:
         else:
             raise Exception('Specify discord token either with a credentials.py file or as an argument.')
 
+
 CLIENT = discord.Client()
+
 
 LOG_USER = {}
 LOG_USER['name'] = 'eniallator#4937'
@@ -52,8 +54,7 @@ async def on_message(message):
     elif not message.server:
         user_command = message.content
 
-    if not message.author.bot and user_command:
-        user_command = message.content.replace(prefix, '', 1)
+    if CLIENT.user.id != message.author.id and user_command:
         log_message = str(message.author) + ' ran: "' + user_command + '"'
         if message.server:
             log_message += ' in server: ' + message.server.name
@@ -70,5 +71,6 @@ async def on_message(message):
         else:
             response = await COMMANDS.execute(user_command, CLIENT, user_command, message)
             await CLIENT.send_message(message.channel, response)
+
 
 CLIENT.run(TOKEN)
