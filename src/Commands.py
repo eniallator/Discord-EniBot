@@ -1,7 +1,7 @@
 """My EniBot command list. If you have an idea for a command, get in touch!"""
 import re
 import random
-from CommandSystem import CommandSystem
+from src.CommandSystem import CommandSystem
 from src.CommandSystems.GOL import GOL_COMMANDS
 
 COMMANDS = CommandSystem()
