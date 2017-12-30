@@ -66,10 +66,12 @@ async def on_message(message):
 
         if user_command.lower().split(' ')[0] == 'help':
             help_command = ' '.join(user_command.split(' ')[1:])
-            help_message = COMMANDS.get_help(CLIENT, help_command, message)
+            help_message = COMMANDS.get_help(help_command, CLIENT, help_command, message)
             await CLIENT.send_message(message.channel, help_message)
         else:
-            await COMMANDS.execute(user_command, CLIENT, user_command, message)
+            output = await COMMANDS.execute(user_command, CLIENT, user_command, message)
+            if isinstance(output, str):
+                await CLIENT.send_message(message.channel, output)
 
 
 CLIENT.run(TOKEN)

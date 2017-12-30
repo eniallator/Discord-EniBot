@@ -24,7 +24,7 @@ class CommandSystem(object):
         if not (cmd_string in self._commands and 'command_system' in self._commands[cmd_string]):
             raise ValueError('Could not find command system when adding a new command.')
 
-    def add_command(self, cmd, cmd_func=lambda client, user_cmd, message: '', cmd_help=lambda client, user_cmd, message: '', specific_help=None):
+    def add_command(self, cmd, cmd_func=None, cmd_help=None, specific_help=None):
         """Adds a command to the current command system"""
         command_value = {'func': cmd_func, 'help': cmd_help}
         if specific_help:
@@ -44,22 +44,22 @@ class CommandSystem(object):
         else:
             raise ValueError('First argument has to be a string or a list when adding a command.')
     
-    def add_command_system(self, cmd_string, cmd_help=lambda client, user_cmd, message: '', cmd_system=None):
+    def add_command_system(self, cmd_string, cmd_help=None, cmd_system=None):
         """Adds a command system within the current command system"""
         if not isinstance(cmd_system, CommandSystem):
             cmd_system = CommandSystem(cmd_string)
         self._validate_add_command(cmd_string)
         self._commands[cmd_string] = {'command_system': cmd_system, 'help': cmd_help}
     
-    async def execute(self, cmd_to_execute, client, user_cmd, message):
+    async def execute(self, cmd_to_execute, *list_args, **dict_args):
         """Executes the desired command (whether it is within child command system or not) with arguments"""
         cmd_args = cmd_to_execute.split(' ')
         if cmd_args and cmd_args[0] in self._commands:
             cmd = self._commands[cmd_args[0]]
-            if 'func' in cmd:
-                return await cmd['func'](client, user_cmd, message)
-            elif 'command_system' in cmd:
-                return await cmd['command_system'].execute(' '.join(cmd_args[1:]), client, user_cmd, message)
+            if 'func' in cmd and callable(cmd['func']):
+                return await cmd['func'](*list_args, **dict_args)
+            elif 'command_system' in cmd and isinstance(cmd['command_system'], CommandSystem):
+                return await cmd['command_system'].execute(' '.join(cmd_args[1:]), *list_args, **dict_args)
             else:
                 return 'Error could not find a callable in the command object.'
         else:
@@ -67,31 +67,34 @@ class CommandSystem(object):
                 return 'Unknown ' + self._system_name + ' system command. Use "help" to get a list of commands.'
             return 'Unknown command. Use "help" to get a list of commands.'
     
-    def _gen_help(self, client, user_cmd, message, prefix):
+    def _get_cmd_help(self, cmd, list_args, specific_help=False):
+        if specific_help and 'specific_help' in cmd and (isinstance(cmd['specific_help'], str) or callable(cmd['specific_help'])):
+            return cmd['specific_help'](*list_args) if callable(cmd['specific_help']) else cmd['specific_help']
+        elif 'help' in cmd and (isinstance(cmd['help'], str) or callable(cmd['help'])):
+            return cmd['help'](*list_args) if callable(cmd['help']) else cmd['help']
+        return 'Error could not find the command\'s help.'
+
+    def _gen_help(self, list_args, prefix=''):
         """Generates the help for the command system"""
         help_message = 'Showing help:'
         if self._system_name:
             help_message = 'Showing help for ' + self._system_name + ': '
         for cmd_string in self._commands:
-            cmd_help = self._commands[cmd_string]['help'](client, user_cmd, message)
+            cmd_help = self._get_cmd_help(self._commands[cmd_string], list_args)
             help_message += '\n`' + prefix + cmd_string + '`: ' + cmd_help
         return help_message + '\nTo learn more about a command, use `help <command>`'
 
-    def get_help(self, client, user_cmd, message, prefix=''):
+    def get_help(self, help_cmd, *list_args, prefix=''):
         """Makes the help for this command system/a child command system and messages it back"""
-        cmd_args = user_cmd.split(' ')
+        cmd_args = help_cmd.split(' ')
         new_prefix = prefix + self._system_name + ' '
         if cmd_args and cmd_args[0] in self._commands:
             cmd = self._commands[cmd_args[0]]
             if 'command_system' in cmd:
-                return cmd['command_system'].get_help(client, ' '.join(cmd_args[1:]), message, prefix=new_prefix)
-            elif 'specific_help' in cmd:
-                return cmd['specific_help'](client, ' '.join(cmd_args[1:]), message)
-            elif 'help' in cmd:
-                return cmd['help'](client, ' '.join(cmd_args[1:]), message)
+                return cmd['command_system'].get_help(' '.join(cmd_args[1:]), *list_args, prefix=new_prefix)
             else:
-                return 'Error could not find the command\'s help.'
+                return self._get_cmd_help(cmd, list_args, specific_help=True)
         elif not cmd_args or cmd_args == ['']:
-            return self._gen_help(client, ' '.join(cmd_args[1:]), message, new_prefix)
+            return self._gen_help(list_args, prefix=new_prefix)
         else:
             return 'Unknown command. Use "help" to get a list of commands.'
