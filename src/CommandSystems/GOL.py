@@ -29,7 +29,6 @@ def _gol_new_validate(args):
         return True
 
 async def _gol_new(client, command_terms, message):
-    print(command_terms)
     string_args = command_terms.split(' ')[2:]
     args = _numberify(string_args)
     response = ''
