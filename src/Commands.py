@@ -71,7 +71,7 @@ async def _emojify(client, user_command, message):
             input_text = input_text[1:]
     if emoji_text:
         await client.send_message(message.channel, emoji_text)
-        return emoji_text
+        return
     await client.send_message(message.channel, 'Bad input. Can only handle characters that ' + ''.join(EMOJI_TRANSLATIONS.keys()) + ' picks up.')
 
 COMMANDS.add_command(
