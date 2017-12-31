@@ -8,7 +8,7 @@ COMMANDS = CommandSystem()
 
 COMMANDS.add_command_system(
     'gol',
-    cmd_help=lambda client, user_cmd, message: 'Game of life genetic algorithm commands.',
+    cmd_help='Game of life genetic algorithm commands.',
     cmd_system=GOL_COMMANDS
 )
 
@@ -18,7 +18,7 @@ async def _ping(client, user_command, message):
 COMMANDS.add_command(
     'ping',
     cmd_func=_ping,
-    cmd_help=lambda client, user_cmd, message: 'Replies with "Pong!"'
+    cmd_help='Replies with "Pong!"'
 )
 
 
@@ -28,7 +28,7 @@ async def _source_code(client, user_command, message):
 COMMANDS.add_command(
     'source_code',
     cmd_func=_source_code,
-    cmd_help=lambda client, user_cmd, message: 'Replies with the source code link.'
+    cmd_help='Replies with the source code link.'
 )
 
 
@@ -77,7 +77,7 @@ async def _emojify(client, user_command, message):
 COMMANDS.add_command(
     'emojify',
     cmd_func=_emojify,
-    cmd_help=lambda client, user_cmd, message: 'Generates emojis from the input text'
+    cmd_help='Generates emojis from the input text'
 )
 
 
@@ -89,7 +89,7 @@ async def _ran_case(client, user_command, message):
 COMMANDS.add_command(
     'ran_case',
     cmd_func=_ran_case,
-    cmd_help=lambda client, user_cmd, message: 'Makes inputted text into it\'s random capitals equivalent like this: tEXt liKE This'
+    cmd_help='Makes inputted text into it\'s random capitals equivalent like this: tEXt liKE This'
 )
 
 
@@ -101,5 +101,5 @@ async def _spaces(client, user_command, message):
 COMMANDS.add_command(
     'spaces',
     cmd_func=_spaces,
-    cmd_help=lambda client, user_cmd, message: 'Removes existing spaces and puts 1 space in between each character'
+    cmd_help='Removes existing spaces and puts 1 space in between each character'
 )
