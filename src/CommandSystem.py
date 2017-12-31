@@ -1,6 +1,3 @@
-# pytest for unit testing
-# patch for default unit testing package
-
 class CommandSystem(object):
     """The command system class"""
 
@@ -9,6 +6,7 @@ class CommandSystem(object):
         self._commands = {}
 
     def _lookup_cmd(self, cmd_string):
+        """Looks up in the current command system to see if the cmd_string is a command already and returns it"""
         if cmd_string in self._commands:
             return self._commands[cmd_string]
         elif cmd_string.lower() in self._commands and not self._commands[cmd_string.lower()]['case_sensitive']:
@@ -50,14 +48,14 @@ class CommandSystem(object):
                 self._commands[cmd[0]]['command_system'].add_command(cmd[1:], cmd_func=cmd_func, cmd_help=cmd_help, specific_help=specific_help, case_sensitive=case_sensitive)
         else:
             raise ValueError('First argument has to be a string or a list when adding a command.')
-    
+
     def add_command_system(self, cmd_string, cmd_help=None, cmd_system=None, case_sensitive=False):
         """Adds a command system within the current command system"""
         if not isinstance(cmd_system, CommandSystem):
             cmd_system = CommandSystem(cmd_string)
         self._validate_add_command(cmd_string)
         self._commands[cmd_string] = {'command_system': cmd_system, 'help': cmd_help, 'case_sensitive': case_sensitive}
-    
+
     async def execute(self, cmd_to_execute, *list_args, **dict_args):
         """Executes the desired command (whether it is within child command system or not) with arguments"""
         cmd_args = cmd_to_execute.split(' ')
@@ -73,8 +71,9 @@ class CommandSystem(object):
             if self._system_name:
                 return 'Unknown ' + self._system_name + ' system command. Use "help" to get a list of commands.'
             return 'Unknown command. Use "help" to get a list of commands.'
-    
+
     def _get_cmd_help(self, cmd, list_args, specific_help=False):
+        """Gets a command's help if it's specific_help or help and accepts callables or strings"""
         if specific_help and 'specific_help' in cmd and (isinstance(cmd['specific_help'], str) or callable(cmd['specific_help'])):
             return cmd['specific_help'](*list_args) if callable(cmd['specific_help']) else cmd['specific_help']
         elif 'help' in cmd and (isinstance(cmd['help'], str) or callable(cmd['help'])):
