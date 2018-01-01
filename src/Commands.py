@@ -61,7 +61,7 @@ async def _emojify(client, user_command, message):
                 max_val = curr_val.group(0)
                 max_regex_key = regex
         if max_regex_key:
-            input_text = input_text[len(max_val) if max_val else 1:]
+            input_text = input_text[len(max_val) or 1:]
             translated_output = EMOJI_TRANSLATIONS[max_regex_key](max_val, message)
             if 'out' in translated_output:
                 emoji_text += translated_output['out']
@@ -84,7 +84,8 @@ COMMANDS.add_command(
 async def _ran_case(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
     ran_case_list = [random.choice([char.lower(), char.upper()]) for char in input_text]
-    await client.send_message(message.channel, ''.join(ran_case_list))
+    output = ''.join(ran_case_list) or 'No input given. This command needs text input.'
+    await client.send_message(message.channel, output)
 
 COMMANDS.add_command(
     'ran_case',
@@ -96,7 +97,8 @@ COMMANDS.add_command(
 async def _spaces(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
     spaces_list = list(re.sub('\s*', '', input_text))
-    await client.send_message(message.channel, ' '.join(spaces_list))
+    output = ' '.join(spaces_list) or 'No input given. This command needs text input.'
+    await client.send_message(message.channel, output)
 
 COMMANDS.add_command(
     'spaces',
