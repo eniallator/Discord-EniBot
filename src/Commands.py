@@ -34,19 +34,19 @@ COMMANDS.add_command(
 
 NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
 EMOJI_TRANSLATIONS = {
-    '[\s]': lambda char, _: {'out': ':white_large_square: '},
-    '[a-zA-Z]': lambda char, _: {'out': ':regional_indicator_' + char.lower() + ': '},
-    '[0-9]': lambda char, _: {'out': ':' + NUMBER_WORDS[int(char)] + ': '},
-    '[?]': lambda char, _: {'out': ':question: '},
-    '[!]': lambda char, _: {'out': ':exclamation: '},
-    '<@[0-9]*>': lambda user_id, message: {'inp': _find_mention(user_id, message)}
+    r'[\s]': lambda char, _: {'out': ':white_large_square: '},
+    r'[a-zA-Z]': lambda char, _: {'out': ':regional_indicator_' + char.lower() + ': '},
+    r'[0-9]': lambda char, _: {'out': ':' + NUMBER_WORDS[int(char)] + ': '},
+    r'[?]': lambda char, _: {'out': ':question: '},
+    r'[!]': lambda char, _: {'out': ':exclamation: '},
+    r'<@[0-9]*>': lambda user_id, message: {'inp': _find_mention(user_id, message)}
 }
 
 
 def _find_mention(user_id, message):
     for member in message.mentions:
         if user_id[2:-1] == member.id:
-            return re.sub('#\d*$', '', str(member))
+            return re.sub(r'#\d*$', '', str(member))
     return ''
 
 async def _emojify(client, user_command, message):
@@ -96,7 +96,7 @@ COMMANDS.add_command(
 
 async def _spaces(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
-    spaces_list = list(re.sub('\s*', '', input_text))
+    spaces_list = list(re.sub(r'\s*', '', input_text))
     output = ' '.join(spaces_list) or 'No input given. This command needs text input.'
     await client.send_message(message.channel, output)
 
