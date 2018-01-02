@@ -32,14 +32,14 @@ async def _gol_new(client, command_terms, message):
     string_args = command_terms.split(' ')[2:]
     args = _numberify(string_args)
     response = ''
-    
+
     if not message.server:
         response = 'GOL commands will only work on a server.'
     elif isinstance(args, int):
         response += 'The term at index ' + str(args + 2) + ' has to be a number.\n'
     elif len(args) > 6:
         response += 'Expecting 6 or less terms.'
-    
+
     if not response and str(message.server):
         if _gol_new_validate(args):
             if str(message.server) in GOL_INSTANCES:
@@ -47,11 +47,11 @@ async def _gol_new(client, command_terms, message):
             try:
                 GOL_INSTANCES[str(message.server)] = GOL_Simulation(*args)
                 response = 'Successfully created a new game of life genetic algorithm.'
-            except:
+            except TypeError:
                 response = 'All arguments have to be integers except for mutation chance which is a float.'
         else:
             response = 'Max processing exceeded. Please choose smaller input arguments.'
-    
+
     await client.send_message(message.channel, response)
 
 GOL_COMMANDS.add_command(
