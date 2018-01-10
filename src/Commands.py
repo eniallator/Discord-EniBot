@@ -81,10 +81,22 @@ COMMANDS.add_command(
 )
 
 
+CONSECUTIVE_CASE_LIMIT = 2
+
 async def _ran_case(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
-    ran_case_list = [random.choice([char.lower(), char.upper()]) for char in input_text]
-    output = ''.join(ran_case_list) or 'No input given. This command needs text input.'
+    past_cases = []
+    output = ''
+    for char in input_text:
+        case = random.randint(0, 1)
+        if sum(past_cases) == CONSECUTIVE_CASE_LIMIT:
+            case = 0
+        elif not sum(past_cases):
+            case = 1
+        past_cases = [case] + past_cases
+        while len(past_cases) > CONSECUTIVE_CASE_LIMIT:
+            del past_cases[len(past_cases) - 1]
+        output += char.upper() if case else char.lower()
     await client.send_message(message.channel, output)
 
 COMMANDS.add_command(
