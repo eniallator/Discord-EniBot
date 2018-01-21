@@ -6,11 +6,34 @@ from src.CommandSystems.GOL import GOL_COMMANDS
 
 COMMANDS = CommandSystem()
 
+
 COMMANDS.add_command_system(
     'gol',
     cmd_help='Game of life genetic algorithm commands.',
     cmd_system=GOL_COMMANDS
 )
+
+
+async def _list_users(client, user_command, message):
+    output = 'User list:'
+    for server in client.servers:
+        output += '\n`' + str(server) + '`:'
+        for member in server.members:
+            output += ' `' + str(member) + '`,'
+        output = output[:-1] + '\n'
+    await client.send_message(message.channel, output[:-1])
+
+def _check_owner(client, user_command, message):
+    if str(message.author) == 'eniallator#4937':
+        return True
+
+COMMANDS.add_command(
+    'list_users',
+    cmd_func=_list_users,
+    cmd_help='Lists all users that this bot can see.',
+    check_perms=_check_owner
+)
+
 
 async def _ping(client, user_command, message):
     await client.send_message(message.channel, 'Pong!')
