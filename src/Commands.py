@@ -45,6 +45,19 @@ COMMANDS.add_command(
 )
 
 
+async def _ran_user(client, user_command, message):
+    print(list(message.server.members))
+    user = random.choice(list(message.server.members))
+    await client.send_message(message.channel, 'I choose <@' + user.id + '>')
+
+COMMANDS.add_command(
+    'ran_user',
+    cmd_func=_ran_user,
+    cmd_help='Picks a random user within the server.',
+    check_perms=lambda client, user_command, message: message.server
+)
+
+
 async def _source_code(client, user_command, message):
     await client.send_message(message.channel, 'https://github.com/eniallator/Discord-EniBot')
 
