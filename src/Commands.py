@@ -3,6 +3,7 @@ import re
 import random
 from src.CommandSystem import CommandSystem
 from src.CommandSystems.GOL import GOL_COMMANDS
+from src.CommandSystems.Minecraft import MINECRAFT_COMMANDS
 
 COMMANDS = CommandSystem()
 
@@ -11,6 +12,13 @@ COMMANDS.add_command_system(
     'gol',
     cmd_help='Game of life genetic algorithm commands.',
     cmd_system=GOL_COMMANDS
+)
+
+
+COMMANDS.add_command_system(
+    'minecraft',
+    cmd_help='Commands todo with minecraft.',
+    cmd_system=MINECRAFT_COMMANDS
 )
 
 
