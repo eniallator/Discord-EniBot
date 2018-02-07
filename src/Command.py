@@ -9,8 +9,9 @@ class Command(BaseCommand):
         self._help_full = help_full
         self._meta_data = kwargs
 
-    def execute(self, args=[], kwargs={}):
+    async def execute(self, args=[], kwargs={}):
         if callable(self._cmd_func):
-            return self._cmd_func(*args, **kwargs)
+            print('cmd execute')
+            return await self._cmd_func(*args, **kwargs)
         else:
             return 'Error could not find a callable in the command object.'

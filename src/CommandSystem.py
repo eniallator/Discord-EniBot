@@ -84,10 +84,10 @@ class CommandSystem(BaseCommand):
         cmd = self._lookup_cmd(cmd_args[0]) if len(cmd_args) > 0 else None
         if cmd:
             if self._validate_permissions(cmd, args, kwargs):
-                if 'func' in cmd and callable(cmd['func']):
-                    return await cmd['func'](*args, **kwargs)
-                elif 'command_system' in cmd and isinstance(cmd['command_system'], CommandSystem):
-                    return await cmd['command_system'].execute(' '.join(cmd_args[1:]), *args, **kwargs)
+                if isinstance(cmd, Command):
+                    return await cmd.execute(args, kwargs)
+                elif isinstance(cmd, CommandSystem):
+                    return await cmd.execute(' '.join(cmd_args[1:]), *args, **kwargs)
                 else:
                     return 'Error could not find a callable in the command object.'
             else:
