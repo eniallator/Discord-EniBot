@@ -2,7 +2,7 @@
 from GOL_Sim.GOL_Simulation import GOL_Simulation
 from src.CommandSystem import CommandSystem
 
-GOL_COMMANDS = CommandSystem()
+GOL_COMMANDS = CommandSystem(help_summary='Game of life genetic algorithm commands.')
 
 GOL_INSTANCES = {}
 GOL_MAX_PROCESSING = 50 ** 50 * (7 * 7)
@@ -57,8 +57,8 @@ async def _gol_new(client, command_terms, message):
 GOL_COMMANDS.add_command(
     'new',
     cmd_func=_gol_new,
-    cmd_help='Create a new game of life genetic algorithm.',
-    specific_help='Where all arguments are optional and all are numbers.\nDefaults: `size=50, width=5, height=5, iterations=30, mutation_chance=0.025, creatures_to_remain=5`\nUsage: `gol new size width height iterations mutation_chance creatures_to_remain`'
+    help_summary='Create a new game of life genetic algorithm.',
+    help_full='Where all arguments are optional and all are numbers.\nDefaults: `size=50, width=5, height=5, iterations=30, mutation_chance=0.025, creatures_to_remain=5`\nUsage: `gol new size width height iterations mutation_chance creatures_to_remain`'
 )
 
 
@@ -83,8 +83,8 @@ async def _gol_next_cycle(client, command_terms, message):
 GOL_COMMANDS.add_command(
     'next_cycle',
     cmd_func=_gol_next_cycle,
-    cmd_help='Evolves the population and gives stats for the population.',
-    specific_help='Receives no arguments.\nFirst it will evaluate and then it will get the stats after evaluation and finally evolve the population.'
+    help_summary='Evolves the population and gives stats for the population.',
+    help_full='Receives no arguments.\nFirst it will evaluate and then it will get the stats after evaluation and finally evolve the population.'
 )
 
 
@@ -121,6 +121,6 @@ async def _gol_cycle(client, command_terms, message):
 GOL_COMMANDS.add_command(
     'cycle',
     cmd_func=_gol_cycle,
-    cmd_help='Evolves the population a number of times and gives stats for the population afterwards.',
-    specific_help='Receives 1 argument; a number from 1-' + str(GOL_MAX_CYCLES) + ' to cycle through the simulation.\n Usage: `gol cycle limit`'
+    help_summary='Evolves the population a number of times and gives stats for the population afterwards.',
+    help_full='Receives 1 argument; a number from 1-' + str(GOL_MAX_CYCLES) + ' to cycle through the simulation.\n Usage: `gol cycle limit`'
 )

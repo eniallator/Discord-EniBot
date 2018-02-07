@@ -10,15 +10,13 @@ COMMANDS = CommandSystem()
 
 COMMANDS.add_command_system(
     'gol',
-    cmd_help='Game of life genetic algorithm commands.',
-    cmd_system=GOL_COMMANDS
+    GOL_COMMANDS
 )
 
 
 COMMANDS.add_command_system(
     'minecraft',
-    cmd_help='Commands todo with minecraft.',
-    cmd_system=MINECRAFT_COMMANDS
+    MINECRAFT_COMMANDS
 )
 
 
@@ -38,7 +36,7 @@ def _check_owner(client, user_command, message):
 COMMANDS.add_command(
     'list_users',
     cmd_func=_list_users,
-    cmd_help='Lists all users that this bot can see.',
+    help_summary='Lists all users that this bot can see.',
     check_perms=_check_owner
 )
 
@@ -49,7 +47,7 @@ async def _ping(client, user_command, message):
 COMMANDS.add_command(
     'ping',
     cmd_func=_ping,
-    cmd_help='Replies with "Pong!"'
+    help_summary='Replies with "Pong!"'
 )
 
 
@@ -61,7 +59,7 @@ async def _ran_user(client, user_command, message):
 COMMANDS.add_command(
     'ran_user',
     cmd_func=_ran_user,
-    cmd_help='Picks a random user within the server.',
+    help_summary='Picks a random user within the server.',
     check_perms=lambda client, user_command, message: message.server
 )
 
@@ -72,7 +70,7 @@ async def _source_code(client, user_command, message):
 COMMANDS.add_command(
     'source_code',
     cmd_func=_source_code,
-    cmd_help='Replies with the source code link.'
+    help_summary='Replies with the source code link.'
 )
 
 
@@ -121,11 +119,12 @@ async def _emojify(client, user_command, message):
 COMMANDS.add_command(
     'emojify',
     cmd_func=_emojify,
-    cmd_help='Generates emojis from the input text'
+    help_summary='Generates emojis from the input text'
 )
 
 
 CONSECUTIVE_CASE_LIMIT = 2
+
 
 async def _ran_case(client, user_command, message):
     input_text = ' '.join(user_command.split(' ')[1:])
@@ -146,7 +145,7 @@ async def _ran_case(client, user_command, message):
 COMMANDS.add_command(
     'ran_case',
     cmd_func=_ran_case,
-    cmd_help='Makes inputted text into it\'s random capitals equivalent like this: tEXt liKE This'
+    help_summary='Makes inputted text into it\'s random capitals equivalent like this: tEXt liKE This'
 )
 
 
@@ -159,5 +158,5 @@ async def _spaces(client, user_command, message):
 COMMANDS.add_command(
     'spaces',
     cmd_func=_spaces,
-    cmd_help='Removes existing spaces and puts 1 space in between each character'
+    help_summary='Removes existing spaces and puts 1 space in between each character'
 )

@@ -3,7 +3,7 @@ import re
 import random
 from src.CommandSystem import CommandSystem
 
-MINECRAFT_COMMANDS = CommandSystem()
+MINECRAFT_COMMANDS = CommandSystem(help_summary='Commands todo with minecraft.')
 
 
 COLOURS = [hex(n)[2:] for n in range(16)]
@@ -23,5 +23,5 @@ async def _ran_colours(client, user_command, message):
 MINECRAFT_COMMANDS.add_command(
     'ran_colours',
     cmd_func=_ran_colours,
-    cmd_help='Inserts random colours for each character.'
+    help_summary='Inserts random colours for each character.'
 )
