@@ -3,6 +3,7 @@ import sys
 import os
 from time import gmtime, strftime
 import discord
+from Config import OWNER
 from src.Commands import COMMANDS
 
 TOKEN = os.environ.get('DISCORD_TOKEN')
@@ -21,7 +22,7 @@ CLIENT = discord.Client()
 
 
 LOG_USER = {}
-LOG_USER['name'] = 'eniallator#4937'
+LOG_USER['name'] = OWNER
 
 def _get_time():
     raw_time = strftime("%Y/%m/%d %H:%M:%S", gmtime())

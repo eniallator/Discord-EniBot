@@ -1,6 +1,7 @@
 """My EniBot command list. If you have an idea for a command, get in touch!"""
 import re
 import random
+from Config import OWNER
 from src.CommandSystem import CommandSystem
 from src.CommandSystems.GOL import GOL_COMMANDS
 from src.CommandSystems.Minecraft import MINECRAFT_COMMANDS
@@ -30,7 +31,7 @@ async def _list_users(client, user_command, message):
     await client.send_message(message.channel, output[:-1])
 
 def _check_owner(client, user_command, message):
-    if str(message.author) == 'eniallator#4937':
+    if str(message.author) == OWNER:
         return True
 
 COMMANDS.add_command(
