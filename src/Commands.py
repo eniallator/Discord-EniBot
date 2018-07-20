@@ -79,10 +79,10 @@ NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', '
 EMOJI_TRANSLATIONS = {
     r'[\s]': lambda char, _: {'out': ':white_large_square: '},
     r'[a-zA-Z]': lambda char, _: {'out': ':regional_indicator_' + char.lower() + ': '},
-    r'[0-9]': lambda char, _: {'out': ':' + NUMBER_WORDS[int(char)] + ': '},
+    r'\d': lambda char, _: {'out': ':' + NUMBER_WORDS[int(char)] + ': '},
     r'[?]': lambda char, _: {'out': ':question: '},
     r'[!]': lambda char, _: {'out': ':exclamation: '},
-    r'<@[0-9]*>': lambda user_id, message: {'inp': _find_mention(user_id, message)}
+    r'<@\d*>': lambda user_id, message: {'inp': _find_mention(user_id, message)}
 }
 
 
