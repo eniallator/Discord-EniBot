@@ -1,3 +1,4 @@
+from inspect import iscoroutinefunction
 from src.BaseCommand import BaseCommand
 
 class Command(BaseCommand):
@@ -9,9 +10,12 @@ class Command(BaseCommand):
         self._help_full = help_full
         self._meta_data = kwargs
 
-    async def execute(self, args=[], kwargs={}):
+    async def execute(self, args, kwargs):
+        """Executing the command within this class"""
         if callable(self._cmd_func):
-            print('cmd execute')
-            return await self._cmd_func(*args, **kwargs)
+            if iscoroutinefunction(self._cmd_func):
+                return await self._cmd_func(*args, **kwargs)
+            else:
+                return self._cmd_func(*args, **kwargs)
         else:
             return 'Error could not find a callable in the command object.'

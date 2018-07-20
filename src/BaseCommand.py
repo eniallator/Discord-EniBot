@@ -1,8 +1,8 @@
 class BaseCommand():
     """The base class for CommandSystem and Command classes"""
 
-    _help_full = None
-    _help_summary = None
+    _help_full = lambda: None
+    _help_summary = lambda: None
     _meta_data = {}
 
     def __getitem__(self, i):

@@ -1,6 +1,7 @@
 from src.BaseCommand import BaseCommand
 from src.Command import Command
 
+
 class CommandSystem(BaseCommand):
     """The command system class"""
 
@@ -28,9 +29,9 @@ class CommandSystem(BaseCommand):
     def _validate_command_system_path(self, cmd_string):
         """Validates that the given command system exists"""
         if not isinstance(cmd_string, str):
-            raise ValueError('Error when locating the path to the command system when adding a new command.')
-        if not (self._lookup_cmd(cmd_string) and isinstance(self._commands[cmd_string]), CommandSystem):
-            raise ValueError('Could not find command system when adding a new command.')
+            raise ValueError('Error when locating the path to the command system.')
+        if not (self._lookup_cmd(cmd_string) and isinstance(self._commands[cmd_string], CommandSystem)):
+            raise ValueError('Could not find command system.')
 
     def _validate_permissions(self, cmd, args, kwargs=None):
         call_checker = lambda func, args, kwargs: func(*args, **kwargs) if kwargs else func(*args)
@@ -52,17 +53,22 @@ class CommandSystem(BaseCommand):
             cmd_string = cmd_string.lower() if not case_sensitive else cmd_string
             self._validate_add_command(cmd_string)
             self._commands[cmd_string] = Command(**kwargs)
-        elif isinstance(cmd, list):
-            if len(cmd) == 1:
-                cmd_string = cmd[0]
-                cmd_string = cmd_string.lower() if not case_sensitive else cmd_string
-                self._validate_add_command(cmd_string)
-                self._commands[cmd_string] = Command(**kwargs)
-            else:
-                self._validate_command_system_path(cmd[0])
-                self._commands[cmd[0]].add_command(cmd[1:], **kwargs)
         else:
-            raise ValueError('First argument has to be a string or a list when adding a command.')
+            raise ValueError('First argument has to be a string when adding a command.')
+
+    def get_command_system(self, cmd_system):
+        if isinstance(cmd_system, str):
+            self._validate_command_system_path(cmd_system)
+            return self._commands[cmd_system]
+        elif isinstance(cmd_system, list) and cmd_system:
+            self._validate_command_system_path(cmd_system[0])
+            cmd_system_ref = self._commands[cmd_system[0]]
+            if len(cmd_system) > 1:
+                return cmd_system_ref.get_command_system(cmd_system[1:])
+            else:
+                return cmd_system_ref
+        else:
+            raise ValueError("Expecting a string or list when getting a command system.")
 
     def add_command_system(self, cmd_string, cmd_system_or_help_summary=None, check_perms=None, case_sensitive=False):
         """Adds a command system within the current command system"""
