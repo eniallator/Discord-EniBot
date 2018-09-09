@@ -63,16 +63,23 @@ async def _get_status(client, user_command, message):
         return
 
     if isinstance(response, dict):
-        players_online = [player['name'] for player in (response['players']['sample'] if 'sample' in response['players'] else [])]
-        await client.send_message(message.channel, embed=Embed(
+        player_list = response['players']['sample'] if 'sample' in response['players'] else []
+        players_online = [player['name'] for player in player_list]
+        embed = Embed(
             title='**' + host + ':' + port + '**',
             type='rich',
             colour=0x32ff32,
-            description=
-            '***Description***: ' + response['description']['text'] +
-            '\n\n***Players online***: ' + str(response['players']['online']) + '/' + str(response['players']['max']) +
-            '\n\n***Player list***:\n' + '\n'.join(players_online)
-        ))
+            description= re.sub('§.', '', response['description']['text'])
+        )
+        embed.add_field(
+            name='***Player list***',
+            value='\n'.join(players_online)
+        )
+        embed.add_field(
+            name='***Players online***',
+            value=str(response['players']['online']) + '/' + str(response['players']['max'])
+        )
+        await client.send_message(message.channel, embed=embed)
     elif isinstance(response, str):
         await client.send_message(message.channel, response)
     else:
