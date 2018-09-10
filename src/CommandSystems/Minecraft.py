@@ -84,7 +84,7 @@ async def _get_status(client, user_command, message):
     elif isinstance(response, str):
         await client.send_message(message.channel, response)
     else:
-        await client.send_message(message.channel, 'Connection timed out.')
+        await client.send_message(message.channel, 'Unexpected ' + type(response) + ' type returned from ping function.')
 
 MINECRAFT_COMMANDS.add_command(
     'get_status',
