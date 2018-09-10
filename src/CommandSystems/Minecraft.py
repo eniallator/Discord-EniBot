@@ -63,21 +63,22 @@ async def _get_status(client, user_command, message):
         return
 
     if isinstance(response, dict):
+        remove_colours = lambda field: re.sub('§.', '', field)
         player_list = response['players']['sample'] if 'sample' in response['players'] else []
-        players_online = [player['name'] for player in player_list]
-        embed = Embed(
-            title='**' + host + ':' + port + '**',
-            type='rich',
-            colour=0x32ff32,
-            description= re.sub('§.', '', response['description']['text'])
-        )
+        players_online = [remove_colours(player['name']) for player in player_list]
+        embed = Embed(type='rich', colour=0x32ff32)
         embed.add_field(
-            name='***Player list***',
-            value='\n'.join(players_online)
+            name='**' + host + (':' + port if port != '25565' else '') + '**',
+            value=remove_colours(response['description']['text'])
         )
         embed.add_field(
             name='***Players online***',
             value=str(response['players']['online']) + '/' + str(response['players']['max'])
+        )
+        embed.add_field(
+            name='***Player list***',
+            value='\n'.join(players_online),
+            inline=False
         )
         await client.send_message(message.channel, embed=embed)
     elif isinstance(response, str):
