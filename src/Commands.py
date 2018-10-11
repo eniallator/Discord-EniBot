@@ -82,7 +82,8 @@ EMOJI_TRANSLATIONS = {
     r'\d': lambda char, _: {'out': ':' + NUMBER_WORDS[int(char)] + ': '},
     r'[?]': lambda char, _: {'out': ':question: '},
     r'[!]': lambda char, _: {'out': ':exclamation: '},
-    r'<@\d*>': lambda user_id, message: {'inp': _find_mention(user_id, message)}
+    r'<@[\!]?\d*>': lambda user_id, message: {'inp': _find_mention(user_id, message)},
+    r'[<>]': lambda char, _: {'out': ':arrow_' + ('back' if char == '<' else 'for') + 'ward: '}
 }
 
 
