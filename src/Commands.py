@@ -21,6 +21,16 @@ COMMANDS.add_command_system(
 )
 
 
+async def _thanks(client, user_command, message):
+    await client.send_message(message.channel, 'You\'re most certifiably welcome, young citizen.')
+
+COMMANDS.add_command(
+    'thanks',
+    cmd_func=_thanks,
+    help_summary='Replies with a kind message'
+)
+
+
 async def _list_users(client, user_command, message):
     output = 'User list:'
     for server in client.servers:
