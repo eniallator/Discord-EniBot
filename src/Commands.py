@@ -99,7 +99,8 @@ EMOJI_TRANSLATIONS = {
 
 def _find_mention(user_id, message):
     for member in message.mentions:
-        if user_id[2:-1] == member.id:
+        match = re.search(r'\d+', user_id)
+        if match and match.group(0) == member.id:
             return re.sub(r'#\d*$', '', str(member))
     return ''
 
