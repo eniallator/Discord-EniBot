@@ -1,6 +1,7 @@
 """My EniBot main script"""
 import sys
 import os
+import configparser
 from time import gmtime, strftime
 import discord
 from Config import OWNER
@@ -10,12 +11,14 @@ TOKEN = os.environ.get('DISCORD_TOKEN')
 
 if not TOKEN:
     try:
-        from Credentials import TOKEN
-    except ModuleNotFoundError:
+        config = configparser.ConfigParser()
+        config.read('auth.ini')
+        TOKEN = config.get('discord', 'token')
+    except configparser.NoSectionError:
         if len(sys.argv) > 1:
             TOKEN = sys.argv[1]
         else:
-            raise Exception('Specify discord token either with a credentials.py file or as an argument.')
+            raise Exception('Specify discord token either with a auth.ini file or as an argument.')
 
 
 CLIENT = discord.Client()
