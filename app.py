@@ -87,6 +87,8 @@ async def multi_command_handler(message, multi_command):
 @CLIENT.event
 async def on_message(message):
     """Handles any user commands"""
+    if message.author.id == CLIENT.user.id:
+        return
     prefix = '<@' + CLIENT.user.id + '> '
     multi_command_prefix = '```' + MULTI_COMMAND_LANGUAGE + '\n'
     multi_command_start = message.content.find(multi_command_prefix)
@@ -98,7 +100,7 @@ async def on_message(message):
         multi_command = multi_command[:multi_command.find('```')]
         await multi_command_handler(message, multi_command)
     elif not message.server:
-        user_command = message.content
+        await command_hander(message, message.content)
 
 
 CLIENT.run(TOKEN)
