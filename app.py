@@ -4,11 +4,10 @@ import os
 import configparser
 from time import gmtime, strftime
 import discord
-from Config import OWNER
+from Config import OWNER, MULTI_COMMAND_LANGUAGE
 from src.Commands import COMMANDS
 
 TOKEN = os.environ.get('DISCORD_TOKEN')
-MULTI_COMMAND_LANGUAGE = 'enibot'
 
 if not TOKEN:
     try:
@@ -83,7 +82,8 @@ async def multi_command_handler(message, multi_command):
     _log(log_message + suffix)
     for cmd in cmds:
         await command_hander(message, cmd, logging=False)
-
+# Create a new client class that inherits the discord.Client class which can get all the send_message calls and pipe them into another command
+# Or redesign and refactor the current system to make it so that each command has an output which can be piped into other commands
 @CLIENT.event
 async def on_message(message):
     """Handles any user commands"""
