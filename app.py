@@ -71,17 +71,23 @@ async def command_hander(message, user_command, logging=True):
 async def multi_command_handler(message, multi_command):
     cmds = multi_command.split('\n')
     cmds = list(filter(lambda cmd: cmd != '', cmds))
+    log_routine = None
     max_cmds = 10
     if len(cmds) > max_cmds:
         await CLIENT.send_message(message.channel, 'Error: multi command handler can handle at max ' + str(max_cmds) + ' commands')
-        _log(str(message.author) + ' tried to run ' + str(len(cmds)) + ' commands within a multi-command')
+        log_routine = _log(str(message.author) + ' tried to run ' + str(len(cmds)) + ' commands within a multi-command')
         return
 
     log_message = str(message.author) + ' ran a multi-command containing: "' + '", "'.join(cmds) + '"'
     suffix = ' in server: "' + message.server.name + '"' if message.server else ' in a private message'
-    _log(log_message + suffix)
+    log_routine = _log(log_message + suffix)
+
+    if LOG_USER['name'] != str(message.author) or message.server:
+        await log_routine
+
     for cmd in cmds:
         await command_hander(message, cmd, logging=False)
+
 # Create a new client class that inherits the discord.Client class which can get all the send_message calls and pipe them into another command
 # Or redesign and refactor the current system to make it so that each command has an output which can be piped into other commands
 @CLIENT.event
