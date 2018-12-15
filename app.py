@@ -31,13 +31,34 @@ def _get_time():
     raw_time = strftime("%Y/%m/%d %H:%M:%S", gmtime())
     return '[' + raw_time + '] '
 
-def _log(msg_to_log, first_log=False):
+async def get_last_msg():
+    if 'member' not in LOG_USER:
+        return
+
+    await CLIENT.start_private_message(LOG_USER['member'])
+    for channel in CLIENT.private_channels:
+        if len(channel.recipients) == 1 and channel.recipients[0].id == LOG_USER['member'].id:
+            log_channel = channel
+
+    async for msg in CLIENT.logs_from(log_channel, limit=1):
+        return msg
+
+async def _log(msg_to_log, first_log=False):
     timestamp_msg = _get_time() + msg_to_log
+    edit_last_msg = False
+
     if first_log:
-        timestamp_msg = '-' * 90 + '\n' +timestamp_msg
+        last_msg = await get_last_msg()
+        if last_msg and last_msg.author.id == CLIENT.user.id and last_msg.content.startswith('-'):
+            edit_last_msg = True
+        else:
+            timestamp_msg = '-' * 90 + '\n' +timestamp_msg
+
     print(timestamp_msg)
-    if 'member' in LOG_USER:
-        return CLIENT.send_message(LOG_USER['member'], timestamp_msg)
+    if edit_last_msg:
+        await CLIENT.edit_message(last_msg, last_msg.content + '\r\n' + timestamp_msg)
+    elif 'member' in LOG_USER:
+        await CLIENT.send_message(LOG_USER['member'], timestamp_msg)
 
 
 @CLIENT.event
