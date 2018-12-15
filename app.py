@@ -52,7 +52,7 @@ async def _log(msg_to_log, first_log=False):
         if last_msg and last_msg.author.id == CLIENT.user.id and last_msg.content.startswith('-'):
             edit_last_msg = True
         else:
-            timestamp_msg = '-' * 90 + '\n' +timestamp_msg
+            timestamp_msg = '-' * 90 + '\n' + timestamp_msg
 
     print(timestamp_msg)
     if edit_last_msg:

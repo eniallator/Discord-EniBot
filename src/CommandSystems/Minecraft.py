@@ -4,7 +4,7 @@ import random
 from socket import timeout
 from discord import Embed
 from src.CommandSystem import CommandSystem
-from src.minecraftStatusPing import StatusPing
+from src.CommandSystems.minecraftStatusPing import StatusPing
 
 MINECRAFT_COMMANDS = CommandSystem(help_summary='Commands todo with minecraft.')
 
