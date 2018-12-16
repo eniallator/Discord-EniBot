@@ -46,8 +46,7 @@ async def _list_users(client, user_command, message):
     await client.send_message(message.channel, output[:-1])
 
 def _check_owner(client, user_command, message):
-    if str(message.author) == OWNER:
-        return True
+    return str(message.author) == OWNER
 
 COMMANDS.add_command(
     'list_users',
@@ -97,7 +96,7 @@ EMOJI_TRANSLATIONS = {
     r'\d': lambda char, _: {'out': ':' + NUMBER_WORDS[int(char)] + ': '},
     r'[?]': lambda char, _: {'out': ':question: '},
     r'[!]': lambda char, _: {'out': ':exclamation: '},
-    r'<@[\!]?\d*>': lambda user_id, message: {'inp': _find_user_mention(user_id, message)},
+    r'<@!?\d*>': lambda user_id, message: {'inp': _find_user_mention(user_id, message)},
     r'<#\d*>': lambda channel_id, message: {'inp': _find_channel_mention(channel_id, message)},
     r'<@&\d*>': lambda role_id, message: {'inp': _find_role_mention(role_id, message)},
     r'[<>]': lambda char, _: {'out': ':arrow_' + ('back' if char == '<' else 'for') + 'ward: '}
