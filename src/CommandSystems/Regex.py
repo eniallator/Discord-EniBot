@@ -5,7 +5,7 @@ from src.CommandSystem import CommandSystem
 def _check_server(client, user_command, message):
     return message.server is not None
 
-REGEX_GAMES_COMMANDS = CommandSystem(help_summary='Commands to do with the regex games system.', check_perms=_check_server)
+REGEX_COMMANDS = CommandSystem(help_summary='Commands to do with the regex system.', check_perms=_check_server)
 STATE = {}
 
 
@@ -21,7 +21,7 @@ async def _ask(client, user_command, message):
     STATE[server_id][user_id] = re.compile(regex)
     await client.send_message(message.channel, 'Successfully submitted a regex challenge.')
 
-REGEX_GAMES_COMMANDS.add_command(
+REGEX_COMMANDS.add_command(
     'ask',
     cmd_func=_ask,
     help_summary='Submit a regex expression for others to solve'
@@ -67,7 +67,7 @@ async def _answer(client, user_command, message):
         await client.send_message(message.channel, 'The longest match was ' + str(longest_match) + ' characters.')
     
 
-REGEX_GAMES_COMMANDS.add_command(
+REGEX_COMMANDS.add_command(
     'answer',
     cmd_func=_answer,
     help_summary='Answer someone\'s regex challenge by mentioning them and then the submitted string'

@@ -5,7 +5,7 @@ from Config import OWNER
 from src.CommandSystem import CommandSystem
 from src.CommandSystems.GOL import GOL_COMMANDS
 from src.CommandSystems.Minecraft import MINECRAFT_COMMANDS
-from src.CommandSystems.RegexGames import REGEX_GAMES_COMMANDS
+from src.CommandSystems.Regex import REGEX_COMMANDS
 
 COMMANDS = CommandSystem()
 
@@ -21,8 +21,8 @@ COMMANDS.add_command_system(
 )
 
 COMMANDS.add_command_system(
-    'regex_games',
-    REGEX_GAMES_COMMANDS
+    'regex',
+    REGEX_COMMANDS
 )
 
 
