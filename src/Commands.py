@@ -91,35 +91,35 @@ COMMANDS.add_command(
 
 NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
 EMOJI_TRANSLATIONS = {
-    r'[\s]': lambda char, _: {'out': ':white_large_square: '},
+    r'\s': lambda char, _: {'out': ':white_large_square: '},
     r'[a-zA-Z]': lambda char, _: {'out': ':regional_indicator_' + char.lower() + ': '},
     r'\d': lambda char, _: {'out': ':' + NUMBER_WORDS[int(char)] + ': '},
     r'[?]': lambda char, _: {'out': ':question: '},
-    r'[!]': lambda char, _: {'out': ':exclamation: '},
-    r'<@!?\d*>': lambda user_id, message: {'inp': _find_user_mention(user_id, message)},
-    r'<#\d*>': lambda channel_id, message: {'inp': _find_channel_mention(channel_id, message)},
-    r'<@&\d*>': lambda role_id, message: {'inp': _find_role_mention(role_id, message)},
+    r'!': lambda char, _: {'out': ':exclamation: '},
+    r'<@!?\d+>': lambda user_id, message: {'inp': _find_user_mention(user_id, message)},
+    r'<#\d+>': lambda channel_id, message: {'inp': _find_channel_mention(channel_id, message)},
+    r'<@&\d+>': lambda role_id, message: {'inp': _find_role_mention(role_id, message)},
     r'[<>]': lambda char, _: {'out': ':arrow_' + ('back' if char == '<' else 'for') + 'ward: '}
 }
 
 
 def _find_user_mention(user_id, message):
+    match = re.search(r'\d+', user_id)
     for member in message.mentions:
-        match = re.search(r'\d+', user_id)
         if match and match.group(0) == member.id:
-            return re.sub(r'#\d*$', '', member.display_name)
+            return re.sub(r'#\d+$', '', member.display_name)
     return ''
 
 def _find_channel_mention(channel_id, message):
+    match = re.search(r'\d+', channel_id)
     for channel in message.channel_mentions:
-        match = re.search(r'\d+', channel_id)
         if match and match.group(0) == channel.id:
             return str(channel)
     return ''
 
 def _find_role_mention(role_id, message):
+    match = re.search(r'\d+', role_id)
     for role in message.role_mentions:
-        match = re.search(r'\d+', role_id)
         if match and match.group(0) == role.id:
             return str(role)
     return ''
@@ -147,7 +147,7 @@ async def _emojify(client, user_command, message):
     if emoji_text:
         await client.send_message(message.channel, emoji_text)
         return
-    await client.send_message(message.channel, 'Bad input. Can only handle characters that ' + ''.join(EMOJI_TRANSLATIONS.keys()) + ' picks up.')
+    await client.send_message(message.channel, 'Bad input. Can only handle characters that "' + '", "'.join(EMOJI_TRANSLATIONS.keys()) + '" picks up.')
 
 COMMANDS.add_command(
     'emojify',

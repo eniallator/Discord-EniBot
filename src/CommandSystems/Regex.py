@@ -29,7 +29,7 @@ REGEX_COMMANDS.add_command(
 
 
 def _get_user_id(user_command):
-    match = re.match(r'<@!?(?P<id>\d*)>', user_command)
+    match = re.match(r'<@!?(?P<id>\d+)>', user_command)
     return match.group('id') if match else None
 
 def _get_longest_match(submission, pattern):
