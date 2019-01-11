@@ -78,7 +78,7 @@ async def _get_status(client, user_command, message):
         )
         embed.add_field(
             name='***Player list***',
-            value='\n'.join(players_online),
+            value='`' + '`\n`'.join(players_online) + '`',
             inline=False
         )
 
