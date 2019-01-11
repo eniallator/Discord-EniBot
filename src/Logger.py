@@ -27,7 +27,7 @@ class Logger:
         async for msg in self._client.logs_from(log_channel, limit=1):
             return msg
 
-    async def log(self, msg_to_log, first_log=False):
+    async def log(self, msg_to_log, logging=True, first_log=False):
         timestamp_msg = self._get_time() + msg_to_log
         edit_last_msg = False
 
@@ -39,6 +39,10 @@ class Logger:
                 timestamp_msg = '-' * 90 + '\n' + timestamp_msg
 
         print(timestamp_msg)
+
+        if not logging:
+            return
+
         if edit_last_msg:
             await self._client.edit_message(last_msg, last_msg.content + '\r\n' + timestamp_msg)
         elif 'member' in self._log_user:

@@ -41,7 +41,7 @@ async def command_hander(message, user_command, logging=True):
             log_message += ' in server: ' + message.server.name
         else:
             log_message += ' in a private message'
-        await logger.log(log_message)
+        await logger.log(log_message, logging=logging)
 
     if user_command.lower().split(' ')[0] == 'help':
         help_command = ' '.join(user_command.split(' ')[1:])
