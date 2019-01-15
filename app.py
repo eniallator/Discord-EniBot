@@ -62,7 +62,7 @@ async def multi_command_handler(message, multi_command):
         return
 
     log_message = str(message.author) + ' ran a multi-command containing: "' + '", "'.join(cmds) + '"'
-    suffix = ' in server: "' + message.server.name + '"' if message.server else ' in a private message'
+    suffix = ' in server: ' + message.server.name if message.server else ' in a private message'
 
     if logger.get_dest_name() != str(message.author) or message.server:
         await logger.log(log_message + suffix)
