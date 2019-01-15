@@ -11,6 +11,7 @@ MINECRAFT_COMMANDS = CommandSystem(help_summary='Commands todo with minecraft.')
 
 COLOURS = [hex(n)[2:] for n in range(16)]
 
+
 async def _ran_colours(client, user_command, message):
     str_input = ' '.join(user_command.split(' ')[2:])
     output = ''
@@ -29,6 +30,7 @@ MINECRAFT_COMMANDS.add_command(
     help_summary='Inserts random colours for each character.'
 )
 
+
 def ping(host, port):
     try:
         port = int(port)
@@ -39,6 +41,7 @@ def ping(host, port):
             return 'Port out of range.'
     except ValueError:
         return 'Port is not a number.'
+
 
 async def _get_status(client, user_command, message):
     args = user_command.split(' ')[2:]

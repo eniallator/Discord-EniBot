@@ -5,6 +5,7 @@ from src.CommandSystem import CommandSystem
 def _check_server(client, user_command, message):
     return message.server is not None
 
+
 REGEX_COMMANDS = CommandSystem(help_summary='Commands to do with the regex system.', check_perms=_check_server)
 STATE = {}
 
@@ -32,6 +33,7 @@ def _get_user_id(user_command):
     match = re.match(r'<@!?(?P<id>\d+)>', user_command)
     return match.group('id') if match else None
 
+
 def _get_longest_match(submission, pattern):
     longest_match, index = 0, 0
 
@@ -45,6 +47,7 @@ def _get_longest_match(submission, pattern):
         index = span[1] if span[1] > index else index + 1
 
     return longest_match
+
 
 async def _answer(client, user_command, message):
     server_id = message.server.id
@@ -65,7 +68,7 @@ async def _answer(client, user_command, message):
         await client.send_message(message.channel, 'Unlucky, there weren\'t any matches this time.')
     else:
         await client.send_message(message.channel, 'The longest match was ' + str(longest_match) + ' characters.')
-    
+
 
 REGEX_COMMANDS.add_command(
     'answer',

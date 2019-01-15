@@ -21,12 +21,14 @@ def _numberify(terms):
             return index
     return num_terms
 
+
 def _gol_new_validate(args):
     default_vals = [50, 5, 5, 30]
     intensive_args = [args[i] if len(args) > i else val for i, val in enumerate(default_vals)]
     accumulator = intensive_args[0] ** intensive_args[3] * (intensive_args[1] * intensive_args[2])
     if accumulator <= GOL_MAX_PROCESSING:
         return True
+
 
 async def _gol_new(client, command_terms, message):
     string_args = command_terms.split(' ')[2:]
@@ -68,11 +70,13 @@ def _validate_gol_instance(server):
     else:
         return 'Game of life instance does not exist. To create, use `gol new`'
 
+
 def _cycle_instance(instance):
     instance.evaluate()
     response = instance.stats()
     instance.evolve_population()
     return response
+
 
 async def _gol_next_cycle(client, command_terms, message):
     response = _validate_gol_instance(str(message.server))
@@ -91,12 +95,14 @@ GOL_COMMANDS.add_command(
 PROGRESS_MESSAGE = {}
 PROGRESS_MESSAGE['format'] = lambda curr, limit: 'Progress: ' + str(curr / limit * 100)[:5] + '%'
 
+
 async def _send_progress(client, message, curr, limit):
     if PROGRESS_MESSAGE['new_message']:
         PROGRESS_MESSAGE['new_message'] = False
         PROGRESS_MESSAGE['message'] = await client.send_message(message.channel, PROGRESS_MESSAGE['format'](curr, limit))
     else:
         PROGRESS_MESSAGE['message'] = await client.edit_message(PROGRESS_MESSAGE['message'], PROGRESS_MESSAGE['format'](curr, limit))
+
 
 async def _gol_cycle(client, command_terms, message):
     response = ''

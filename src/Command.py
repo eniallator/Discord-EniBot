@@ -1,6 +1,7 @@
 from inspect import iscoroutinefunction
 from src.BaseCommand import BaseCommand
 
+
 class Command(BaseCommand):
     """The command class"""
 

@@ -36,6 +36,10 @@ COMMANDS.add_command(
 )
 
 
+def _check_owner(client, user_command, message):
+    return str(message.author) == OWNER
+
+
 async def _list_users(client, user_command, message):
     output = 'User list:'
     for server in client.servers:
@@ -44,9 +48,6 @@ async def _list_users(client, user_command, message):
             output += ' `' + str(member) + '`,'
         output = output[:-1] + '\n'
     await client.send_message(message.channel, output[:-1])
-
-def _check_owner(client, user_command, message):
-    return str(message.author) == OWNER
 
 COMMANDS.add_command(
     'list_users',
@@ -110,6 +111,7 @@ def _find_user_mention(user_id, message):
             return re.sub(r'#\d+$', '', member.display_name)
     return ''
 
+
 def _find_channel_mention(channel_id, message):
     match = re.search(r'\d+', channel_id)
     for channel in message.channel_mentions:
@@ -117,12 +119,14 @@ def _find_channel_mention(channel_id, message):
             return str(channel)
     return ''
 
+
 def _find_role_mention(role_id, message):
     match = re.search(r'\d+', role_id)
     for role in message.role_mentions:
         if match and match.group(0) == role.id:
             return str(role)
     return ''
+
 
 async def _emojify(client, user_command, message):
     emoji_text = ''

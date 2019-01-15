@@ -1,5 +1,6 @@
 from time import gmtime, strftime
 
+
 class Logger:
     def __init__(self, client, log_dest):
         self._client = client

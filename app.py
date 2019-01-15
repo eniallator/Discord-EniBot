@@ -22,8 +22,8 @@ if not TOKEN:
 
 
 CLIENT = discord.Client()
-
 logger = Logger(CLIENT, OWNER)
+
 
 @CLIENT.event
 async def on_ready():
@@ -33,6 +33,7 @@ async def on_ready():
             logger.set_member(member)
             break
     await logger.log('Bot logged in with name: "' + CLIENT.user.name + '" and id: ' + CLIENT.user.id + '\n', first_log=True)
+
 
 async def command_hander(message, user_command, logging=True):
     if logging and logger.get_dest_name() != str(message.author) or message.server:
@@ -51,6 +52,7 @@ async def command_hander(message, user_command, logging=True):
         output = await COMMANDS.execute(user_command, CLIENT, user_command, message)
         if isinstance(output, str):
             await CLIENT.send_message(message.channel, output)
+
 
 async def multi_command_handler(message, multi_command):
     cmds = multi_command.split('\n')
@@ -72,6 +74,8 @@ async def multi_command_handler(message, multi_command):
 
 # Create a new client class that inherits the discord.Client class which can get all the send_message calls and pipe them into another command
 # Or redesign and refactor the current system to make it so that each command has an output which can be piped into other commands
+
+
 @CLIENT.event
 async def on_message(message):
     """Handles any user commands"""

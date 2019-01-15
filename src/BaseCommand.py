@@ -8,7 +8,6 @@ class BaseCommand():
     def __getitem__(self, i):
         return self._meta_data[i] if i in self._meta_data else None
 
-
     def get_individual_help(self, args, help_full=False):
         """Gets a command's help if it's help_full or help_summary and accepts callables or strings"""
         if help_full and self._help_full and (isinstance(self._help_full, str) or callable(self._help_full)):
