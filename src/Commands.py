@@ -68,7 +68,6 @@ COMMANDS.add_command(
 
 
 async def _ran_user(client, user_command, message):
-    print(list(message.server.members))
     user = random.choice(list(message.server.members))
     await client.send_message(message.channel, 'I choose <@' + user.id + '>')
 
