@@ -73,5 +73,35 @@ async def _answer(client, user_command, message):
 REGEX_COMMANDS.add_command(
     'answer',
     cmd_func=_answer,
-    help_summary='Answer someone\'s regex challenge by mentioning them and then the submitted string'
+    help_summary='Submit a string to see if it gets a match from someone else\'s regex',
+    help_full='Submit a string to see if it gets a match from someone else\'s regex.\nUsage: answer [mentioned user] [string to match from]'
+)
+
+
+def _find_obj_from_id(parent, obj_id):
+    for obj in parent:
+        if obj.id == obj_id:
+            return obj
+
+
+async def _list(client, user_command, message):
+    server_id = message.server.id
+    if server_id not in STATE or STATE[server_id] == []:
+        await client.send_message(message.channel, 'There aren\'t any active regex patterns to solve yet.')
+        return
+
+    msg = 'Currently active regex patterns:'
+    server = _find_obj_from_id(client.servers, server_id)
+    for user_id in STATE[server_id]:
+        member = _find_obj_from_id(server.members, user_id)
+        name = member.nick if member.nick else member.name
+        msg += '\n' + name + ' submitted: ' + STATE[server_id][user_id].pattern
+
+    await client.send_message(message.channel, msg)
+
+
+REGEX_COMMANDS.add_command(
+    'list',
+    cmd_func=_list,
+    help_summary='List all currently active regex patterns that you can solve'
 )
